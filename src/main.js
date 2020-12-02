@@ -58,6 +58,48 @@ const calculatePlayerPos = (playerDot, offsetX, offsetY, lastMouseX, lastMouseY)
 }
 calculatePlayerPos(playerDot, offsetX, offsetY);
 
+const searchForCircle = (computedDots, start, end, heritage, directHeritage) => {
+  let longestRouteDots = [];
+  for (let xDir = -1; xDir <= 1; xDir += 1) {
+    for (let yDir = -1; yDir <= 1; yDir += 1) {
+
+      if (start.x + xDir === end.x && start.y + yDir === end.y && directHeritage !== end) {
+        return [start];
+      }
+
+      if (
+        yDir === 0 && xDir === 0
+        || heritage.some(
+          (heritagePoint) => start.x + xDir === heritagePoint.x && start.y + yDir === heritagePoint.y
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        computedDots[start.x + xDir]
+        && computedDots[start.x + xDir][start.y + yDir]
+        && computedDots[start.x + xDir][start.y + yDir].party === start.party
+      ) {
+        const result = searchForCircle(computedDots, computedDots[start.x + xDir][start.y + yDir], end, [start, ...heritage], start);
+        if (
+          result !== null
+          && result.length > longestRouteDots
+        ) {
+          longestRouteDots = result;
+        }
+      }
+      
+    }
+  }
+  if (longestRouteDots.length === 0) {
+    return null;
+  }
+  longestRouteDots = [start, ...longestRouteDots];
+  return longestRouteDots;
+}
+
+
 document.getElementById('background').addEventListener('mousemove', e => {
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
@@ -68,33 +110,35 @@ document.getElementById('background').addEventListener('mousemove', e => {
 document.getElementById('background').addEventListener('mousedown', e => {
   const xPos = Math.floor((lastMouseX - offsetX) / 32);
   const yPos = Math.floor((lastMouseY - offsetY) / 32);
-  let newDot = two.makeCircle(0, 0, 5, 5);
+  let newDotVisual = two.makeCircle(0, 0, 5, 5);
   if (currentPlayer) {
-    newDot.fill = '#FCAF58';
-    newDot.stroke = '#FF8C42';
-    newDot.linewidth = 2;
+    newDotVisual.fill = '#FCAF58';
+    newDotVisual.stroke = '#FF8C42';
+    newDotVisual.linewidth = 2;
     playerDot.fill = '#70C2BF';
     playerDot.stroke = '#48A9A6';
     playerDot.linewidth = 2;
   } else {
-    newDot.fill = '#70C2BF';
-    newDot.stroke = '#48A9A6';
-    newDot.linewidth = 2;
+    newDotVisual.fill = '#70C2BF';
+    newDotVisual.stroke = '#48A9A6';
+    newDotVisual.linewidth = 2;
     playerDot.fill = '#FCAF58';
     playerDot.stroke = '#FF8C42';
     playerDot.linewidth = 2;
   }
-  calculatePointPos(newDot, xPos, yPos, offsetX, offsetY);
-  displayedDots.push({
+  calculatePointPos(newDotVisual, xPos, yPos, offsetX, offsetY);
+  const newDot = {
     x: xPos,
     y: yPos,
-    visual: newDot,
-  });
+    party: currentPlayer ? 0 : 1,
+    visual: newDotVisual,
+  };
+  displayedDots.push(newDot);
   if (!computedDots[xPos]) {
     computedDots[xPos] = {};
   }
   computedDots[xPos][yPos] = newDot;
-  // checkForCircle(computedDots, xPos, yPos);
+  console.log(searchForCircle(computedDots, newDot, newDot, [], newDot));
   console.log(computedDots);
   currentPlayer = !currentPlayer;
 });
