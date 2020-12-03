@@ -58,46 +58,164 @@ const calculatePlayerPos = (playerDot, offsetX, offsetY, lastMouseX, lastMouseY)
 }
 calculatePlayerPos(playerDot, offsetX, offsetY);
 
-const searchForCircle = (computedDots, start, end, heritage, directHeritage) => {
-  let longestRouteDots = [];
+const cicleSearch2 = (computedDots, start, end, heritage) => {
+  const idPositions = {
+    0: {x: -1, y: -1},
+    1: {x: -1, y: 0},
+    2: {x: -1, y: 1},
+    3: {x: 0, y: 1},
+    4: {x: 1, y: 1},
+    5: {x: 1, y: 0},
+    6: {x: 1, y: -1},
+    7: {x: 0, y: -1},
+  };
+  const positionsId = {
+    0: {
+      0: 0,
+      1: 1,
+      2: 2,
+    },
+    1: {
+      0: 7,
+      2: 3,
+    },
+    2: {
+      0: 6,
+      1: 5,
+      2: 4,
+    },
+   
+  };
+  let startXOff;
+  if (heritage.x < 0) {
+    startXOff = 0 - (start.x - heritage.x)
+  } else {
+    startXOff = heritage.x - start.x
+  }
+  let startYOff;
+  if (heritage.y < 0) {
+    startYOff = 0 - (start.y - heritage.y)
+  } else {
+    startYOff = heritage.y - start.y
+  }
+  const heritageId = positionsId[startXOff + 1][startYOff + 1];
+  for (let startId = (heritageId + 2) % 8; startId !== heritageId; startId = (startId + 1) % 8) {
+    const nextXPos = start.x + idPositions[startId].x;
+    const nextYPos = start.y + idPositions[startId].y;
+
+    // Found end
+    if ( nextXPos === end.x && nextYPos === end.y) {
+      return {length: 1, path: [start]};
+    }
+
+    if (
+      computedDots[nextXPos]
+      && computedDots[nextXPos][nextYPos]
+      && computedDots[nextXPos][nextYPos].party === start.party
+    ) {
+      // Seach next right
+      const result = cicleSearch2(computedDots, computedDots[nextXPos][nextYPos], end, start);
+      if (result) {
+        return {length: result.length + 1, path: [start, ...result.path]};
+      }
+    }
+  }
+  return null;
+}
+
+const startCicleSearch2 = (computedDots, start) => {
+  let longestRoute = {length: 0, path: []}
   for (let xDir = -1; xDir <= 1; xDir += 1) {
     for (let yDir = -1; yDir <= 1; yDir += 1) {
-
-      if (start.x + xDir === end.x && start.y + yDir === end.y && directHeritage !== end) {
-        return [start];
-      }
-
-      if (
-        yDir === 0 && xDir === 0
-        || heritage.some(
-          (heritagePoint) => start.x + xDir === heritagePoint.x && start.y + yDir === heritagePoint.y
-        )
-      ) {
-        continue;
-      }
+      if (yDir === 0 && xDir === 0) continue;
 
       if (
         computedDots[start.x + xDir]
         && computedDots[start.x + xDir][start.y + yDir]
         && computedDots[start.x + xDir][start.y + yDir].party === start.party
       ) {
-        const result = searchForCircle(computedDots, computedDots[start.x + xDir][start.y + yDir], end, [start, ...heritage], start);
-        if (
-          result !== null
-          && result.length > longestRouteDots
-        ) {
-          longestRouteDots = result;
+        const result = cicleSearch2(computedDots, computedDots[start.x + xDir][start.y + yDir], start, start);
+        console.log(result);
+        if (result && longestRoute.length < result.length) {
+          longestRoute = {length: result.length + 1, path: [start, ...result.path]};
         }
       }
-      
     }
   }
-  if (longestRouteDots.length === 0) {
+  if (longestRoute.length <= 2) {
     return null;
   }
-  longestRouteDots = [start, ...longestRouteDots];
-  return longestRouteDots;
+  return longestRoute;
 }
+
+// const searchForCircle = (computedDots, start, end, heritage, directHeritage, route) => {
+//   let longestRouteDots = {area: 0, path: []};
+//   for (let xDir = -1; xDir <= 1; xDir += 1) {
+//     for (let yDir = -1; yDir <= 1; yDir += 1) {
+//       const newHeritage = {...heritage};
+//       if (!newHeritage[start.x]) {
+//         newHeritage[start.x] = {};
+//       }
+//       newHeritage[start.x][start.y] = start;
+
+//       const newRoute = [...route, start];
+
+//       if (start.x + xDir === end.x && start.y + yDir === end.y && directHeritage !== end) {
+//         let area = 0;
+//         console.log(Object.keys(newHeritage));
+//         console.log(newHeritage);
+//         Object.keys(newHeritage).forEach((xSegment) => {
+//           let min = Number.MAX_SAFE_INTEGER;
+//           let max = 0;
+//           Object.keys(newHeritage[xSegment]).forEach((ySegment) => {
+//             const ySegmentNumber = parseInt(ySegment);
+//             if (ySegmentNumber < min) {
+//               min = ySegmentNumber;
+//             }
+//             if (ySegmentNumber > max) {
+//               max = ySegmentNumber;
+//             }
+//           })
+//           // const minYSegment = parseInt(Math.min());
+//           // const maxYSegment = parseInt(Math.max(Object.keys(heritage[xSegment])));
+//           // console.log(Object.keys(heritage[xSegment]));
+//           // console.log(minYSegment);
+//           // console.log(maxYSegment);
+//           area += max - min + 1;
+//         })
+//         return { path: newHeritage, area, route: newRoute };
+//       }
+
+//       if (
+//         yDir === 0 && xDir === 0
+//         || (heritage[start.x + xDir] && heritage[start.x + xDir][start.y + yDir])
+//       ) {
+//         continue;
+//       }
+
+//       if (
+//         computedDots[start.x + xDir]
+//         && computedDots[start.x + xDir][start.y + yDir]
+//         && computedDots[start.x + xDir][start.y + yDir].party === start.party
+//       ) {
+//         const result = searchForCircle(computedDots, computedDots[start.x + xDir][start.y + yDir], end, newHeritage, start, newRoute);
+//         if (
+//           result !== null
+//           && result.area > longestRouteDots.area
+//         ) {
+//           console.log(result);
+//           longestRouteDots = result;
+//         }
+//       }
+      
+//     }
+//   }
+//   if (longestRouteDots.area === 0) {
+//     return null;
+//   }
+//   // longestRouteDots = {...longestRouteDots, path: [start, ...longestRouteDots.path]};
+//   return longestRouteDots;
+// }
 
 
 document.getElementById('background').addEventListener('mousemove', e => {
@@ -138,8 +256,35 @@ document.getElementById('background').addEventListener('mousedown', e => {
     computedDots[xPos] = {};
   }
   computedDots[xPos][yPos] = newDot;
-  console.log(searchForCircle(computedDots, newDot, newDot, [], newDot));
-  console.log(computedDots);
+
+  const resultCircle = startCicleSearch2(computedDots, newDot);
+  console.log(resultCircle);
+  // const longestRouteDots = searchForCircle(computedDots, newDot, newDot, {}, newDot, []);
+
+  if (resultCircle) {
+    // const route = [];
+
+    // for ((xSegment) of) {
+    //   console.log(xSegment);
+    // }
+    // Object.keys(resultCircle.path).forEach((xSegment) => {
+    //   Object.keys(resultCircle.path[xSegment]).forEach((ySegment) => {
+    //     route.push(resultCircle.path[xSegment][ySegment]);
+    //   })
+    // })
+    // .forEach((xSegment) => {
+    //   xSegment.forEach((ySegment, value) => {
+    //     route.push([value]);
+    //   })
+    // })
+
+    const vertices = resultCircle.path.map((routElement) => new Two.Vector(routElement.x * 32 + 16, routElement.y * 32 + 16));
+    console.log(vertices);
+    var path = new Two.Path(vertices, true, false);
+    two.add(path);
+    path.stroke = '#6dcff6';
+    path.linewidth = 2;
+  }
   currentPlayer = !currentPlayer;
 });
 
