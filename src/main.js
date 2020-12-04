@@ -6,6 +6,7 @@ var two = new Two({
 }).appendTo(document.body);
 
 const displayedDots = [];
+const displayedPaths = [];
 const computedDots = {};
 
 let currentPlayer = true;
@@ -32,8 +33,14 @@ let offsetX = 0;
 let offsetY = 0;
 const navigateBoard = (offsetX, offsetY) => {
   displayedDots.forEach((dot) => {
+    if (dot.invalid) {
+      dot.visual.fill = '#fff';
+    }
     calculatePointPos(dot.visual, dot.x, dot.y, offsetX, offsetY);
   });
+  displayedPaths.forEach((path) => {
+    calculatePointPos(path.visual, path.x, path.y, offsetX, offsetY);
+  })
   zero.translation.set(16 + offsetX, 16 + offsetY);
   const backgroundXOffset = Math.round(offsetX % 32);
   const backgroundYOffset = Math.round(offsetY % 32);
@@ -157,7 +164,8 @@ const circleSearch = (computedDots, start, end, heritage) => {
 
     // Found end
     if ( nextXPos === end.x && nextYPos === end.y) {
-      return {length: 1, path: [start]};
+      // DANGER! startId might not be accurate
+      return {length: 1, path: [{...start, in: heritageId, out: startId}]};
     }
 
     if (
@@ -211,68 +219,83 @@ const findCircles = (computedDots, start) => {
 }
 
 const isLeft = (direction) => {
-  //   return direction >= 0 && direction <= 2;
-  // }
-  
-  // const isRight = (direction) => {
-  //   return direction >= 4 && direction <= 6;
-  // }
-  
-  // const isTop = (direction) => {
-  //   return direction === 7;
-  // }
-  
-  // const isBottom = (direction) => {
-  //   return direction === 3;
-  // }
-  
-  // const invalidateCircled = (computedDots, resultCircle) => {
-  //   const positionedResultCircle = {};
-  //   resultCircle.path.forEach((point) => {
-  //     if (!positionedResultCircle[point.x]) {
-  //       positionedResultCircle[point.x] = [];
-  //     }
-  //     positionedResultCircle[point.x].push(point);
-  //   });
-  
-  //   Object.keys(positionedResultCircle).forEach((xSegment) => {
-  //     const sortedXSegment = positionedResultCircle[xSegment].sort((a, b) => a.y - b.y);
-  //     sortedXSegment.forEach((point) => {
-  //       if (isBottom(point.in) || isBottom(point.out) || isLeft(point.in)) return;
-  //       if ((isLeft(point.in) && isLeft(point.out)) || (isRight(point.in) && isRight(point.out))) return;
-  //       if ((isRight(point.in) || point.in == -1) && sortedXSegment[sortedXSegment.indexOf(point) + 1]) {
-  
-  //         const pointBeneath = sortedXSegment[sortedXSegment.indexOf(point) + 1];
-  //         if (isLeft(pointBeneath.in)) {
-  //           // invalidate all points / set new between point & pointBeneath
-  //           for (let yPos = point.y; yPos < pointBeneath.y; yPos += 1) {
-              
-  //             console.log('invalidate');
-  //             console.log(point.x, yPos)
-  //             if (computedDots[point.x]) {
-  //               if (computedDots[point.x][yPos]) {
-  //                 computedDots[point.x][yPos].invalid = true;
-  //                 continue;
-  //               }
-  //             } else {
-  //               computedDots[point.x] = {};
-  //             }
-  //             // Create point if needed
-  //             let newDotVisual = two.makeCircle(0, 0, 5, 5);
-  //             const newDot = {
-  //               x: point.x,
-  //               y: yPos,
-  //               party: -1,
-  //               visual: newDotVisual,
-  //               invalid: true,
-  //             };
-  //             computedDots[point.x][yPos] = newDot;
-  //           }
-  //         }
-  //       }
-  //     });
-  //   })
-  // }
+  return direction >= 0 && direction <= 2;
+}
+
+const isRight = (direction) => {
+  return direction >= 4 && direction <= 6;
+}
+
+const isTop = (direction) => {
+  return direction === 7;
+}
+
+// const isBottom = (direction) => {
+//   return direction === 3;
+// }
+
+const invalidateCircled = (computedDots, resultCircle) => {
+  const positionedResultCircle = {};
+  resultCircle.path.forEach((point) => {
+    if (!positionedResultCircle[point.x]) {
+      positionedResultCircle[point.x] = [];
+    }
+    if (positionedResultCircle[point.x].some((positionedPoint) => point.x === positionedPoint.x && point.y === positionedPoint.y)) {
+      positionedResultCircle[point.x].filter((positionedPoint) => !(point.x === positionedPoint.x && point.y === positionedPoint.y));
+    } else {
+      positionedResultCircle[point.x].push(point);
+    }
+  });
+
+  Object.keys(positionedResultCircle).forEach((xSegment) => {
+    const sortedYSegment = positionedResultCircle[xSegment].sort((a, b) => a.y - b.y);
+    // Iterating from top to bottom
+    // console.log(sortedYSegment)
+    sortedYSegment.forEach((point) => {
+      // Ignore if a path node is below
+      if (
+        (isRight(point.in) && (isLeft(point.out) || isTop(point.out)))
+        // || (isLeft(point.in) && isTop(point.out))
+        || (isTop(point.in) && isLeft(point.out)) //|| isRight(point.out)))
+        
+      ) {
+
+        // console.log(point);
+        // console.log(positionedResultCircle);
+        // console.log(sortedYSegment);
+        const pointBeneath = sortedYSegment[sortedYSegment.indexOf(point) + 1];
+     
+        // invalidate all points / set new between point & pointBeneath
+        for (let yPos = point.y + 1; yPos < pointBeneath.y; yPos += 1) {
+          // console.log("invalidate");
+          // console.log(`${point.x},${yPos}`);
+
+          if (computedDots[point.x]) {
+            if (computedDots[point.x][yPos]) {
+              computedDots[point.x][yPos].invalid = true;
+              continue;
+            }
+          } else {
+            computedDots[point.x] = {};
+          }
+          // Create point if needed
+          let newDotVisual = two.makeCircle(0, 0, 5, 5);
+          newDotVisual.fill = '#70C2BF';
+          newDotVisual.stroke = '#48A9A6';
+          newDotVisual.linewidth = 2;
+          const newDot = {
+            x: point.x,
+            y: yPos,
+            party: -1,
+            visual: newDotVisual,
+            invalid: true,
+          };
+          computedDots[point.x][yPos] = newDot;
+        }
+      }
+    });
+  })
+}
 
 document.getElementById('background').addEventListener('mousemove', e => {
   lastMouseX = e.clientX;
@@ -284,46 +307,53 @@ document.getElementById('background').addEventListener('mousemove', e => {
 document.getElementById('background').addEventListener('mousedown', e => {
   const xPos = Math.floor((lastMouseX - offsetX) / 32);
   const yPos = Math.floor((lastMouseY - offsetY) / 32);
-  let newDotVisual = two.makeCircle(0, 0, 5, 5);
-  if (currentPlayer) {
-    newDotVisual.fill = '#FCAF58';
-    newDotVisual.stroke = '#FF8C42';
-    newDotVisual.linewidth = 2;
-    playerDot.fill = '#70C2BF';
-    playerDot.stroke = '#48A9A6';
-    playerDot.linewidth = 2;
-  } else {
-    newDotVisual.fill = '#70C2BF';
-    newDotVisual.stroke = '#48A9A6';
-    newDotVisual.linewidth = 2;
-    playerDot.fill = '#FCAF58';
-    playerDot.stroke = '#FF8C42';
-    playerDot.linewidth = 2;
-  }
-  calculatePointPos(newDotVisual, xPos, yPos, offsetX, offsetY);
-  const newDot = {
-    x: xPos,
-    y: yPos,
-    party: currentPlayer ? 0 : 1,
-    visual: newDotVisual,
-    invalid: false,
-  };
-  displayedDots.push(newDot);
-  if (!computedDots[xPos]) {
-    computedDots[xPos] = {};
-  }
-  computedDots[xPos][yPos] = newDot;
 
-  const resultCircle = findCircles(computedDots, newDot);
-
-  if (resultCircle) {
-    const vertices = resultCircle.path.map((routElement) => new Two.Vector(routElement.x * 32 + 16, routElement.y * 32 + 16));
-    var path = new Two.Path(vertices, true, false);
-    two.add(path);
-    path.stroke = '#6dcff6';
-    path.linewidth = 2;
+  if (!computedDots[xPos] || !computedDots[xPos][yPos]) {
+    let newDotVisual = two.makeCircle(0, 0, 5, 5);
+    if (currentPlayer) {
+      newDotVisual.fill = '#FCAF58';
+      newDotVisual.stroke = '#FF8C42';
+      newDotVisual.linewidth = 2;
+      playerDot.fill = '#70C2BF';
+      playerDot.stroke = '#48A9A6';
+      playerDot.linewidth = 2;
+    } else {
+      newDotVisual.fill = '#70C2BF';
+      newDotVisual.stroke = '#48A9A6';
+      newDotVisual.linewidth = 2;
+      playerDot.fill = '#FCAF58';
+      playerDot.stroke = '#FF8C42';
+      playerDot.linewidth = 2;
+    }
+    calculatePointPos(newDotVisual, xPos, yPos, offsetX, offsetY);
+    const newDot = {
+      x: xPos,
+      y: yPos,
+      party: currentPlayer ? 0 : 1,
+      visual: newDotVisual,
+      invalid: false,
+    };
+    displayedDots.push(newDot);
+    if (!computedDots[xPos]) {
+      computedDots[xPos] = {};
+    }
+    computedDots[xPos][yPos] = newDot;
+  
+    const resultCircle = findCircles(computedDots, newDot);
+  
+    if (resultCircle) {
+      invalidateCircled(computedDots, resultCircle);
+      const vertices = resultCircle.path.map((routElement) => new Two.Vector((routElement.x - resultCircle.path[0].x) * 32, (routElement.y - resultCircle.path[0].y) * 32));
+      var path = new Two.Path(vertices, true, false);
+      two.add(path);
+      path.stroke = currentPlayer ? '#FF8C42' : '#48A9A6';
+      path.fill = 'transparent';
+      path.linewidth = 4;
+      displayedPaths.push({visual: path, x: resultCircle.path[0].x, y: resultCircle.path[0].y});
+      navigateBoard(offsetX, offsetY);
+    }
+    currentPlayer = !currentPlayer;
   }
-  // currentPlayer = !currentPlayer;
 });
 
 document.addEventListener("keydown", (e) => {
