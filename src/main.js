@@ -1,6 +1,6 @@
 import Two from 'two.js';
 
-var two = new Two({
+const two = new Two({
   fullscreen: true,
   autostart: true
 }).appendTo(document.body);
@@ -10,9 +10,9 @@ const displayedPaths = [];
 const computedDots = {};
 
 let currentPlayer = true;
-var playerDot = two.makeCircle(0, 0, 5 ,5);
-var zero = two.makeCircle(0, 0, 5 ,5);
-var mouse = two.makeCircle(0, 0, 5 ,5);
+const playerDot = two.makeCircle(0, 0, 5 ,5);
+// const zero = two.makeCircle(0, 0, 5 ,5);
+// var mouse = two.makeCircle(0, 0, 5 ,5);
 const playerOneColor = {
   fill: '#FCAF58',
   stroke: '#FF8C42',
@@ -41,7 +41,7 @@ const navigateBoard = (offsetX, offsetY) => {
   displayedPaths.forEach((path) => {
     calculatePointPos(path.visual, path.x, path.y, offsetX, offsetY);
   })
-  zero.translation.set(16 + offsetX, 16 + offsetY);
+  // zero.translation.set(16 + offsetX, 16 + offsetY);
   const backgroundXOffset = Math.round(offsetX % 32);
   const backgroundYOffset = Math.round(offsetY % 32);
   document.getElementById('background').style.backgroundPositionX = `${backgroundXOffset}px`;
@@ -174,6 +174,8 @@ const circleSearch = (computedDots, start, end, heritage) => {
       && computedDots[nextXPos][nextYPos].party === start.party
       && !computedDots[nextXPos][nextYPos].invalid
     ) {
+
+
       // Seach next right
       const result = circleSearch(computedDots, computedDots[nextXPos][nextYPos], end, start);
       
@@ -183,6 +185,56 @@ const circleSearch = (computedDots, start, end, heritage) => {
     }
   }
   return null;
+}
+
+const discoverInvolved = (computedDots, start, end, dotsInvolved = []) => {
+  if (!dotsInvolved[start.x]) {
+    dotsInvolved[start.x] = {};
+  }
+  dotsInvolved[start.x][start.y] = start;
+
+  let discoveredDots = [];
+  let neighborCount = 0;
+
+  let hasBackloop = false;
+  for (let xDir = -1; xDir <= 1; xDir += 1) {
+    for (let yDir = -1; yDir <= 1; yDir += 1) {
+      if (xDir === 0 && yDir === 0) continue;
+
+      const nextXPos = start.x + xDir;
+      const nextYPos = start.y + yDir;
+
+      if (nextXPos === end.x && nextYPos === end.y) {
+        hasBackloop = true;
+      }
+
+      if (
+        computedDots[nextXPos]
+        && computedDots[nextXPos][nextYPos]
+        && computedDots[nextXPos][nextYPos].party === start.party
+        && !computedDots[nextXPos][nextYPos].invalid
+      ) {
+        neighborCount += 1;
+        // If not used until now
+        if (!dotsInvolved[nextXPos] || !dotsInvolved[nextXPos][nextYPos]) {
+          const furtherSearchResults = discoverInvolved(computedDots, computedDots[nextXPos][nextYPos], end, dotsInvolved);
+          if (furtherSearchResults.length !== 0) {
+            discoveredDots = [...discoveredDots, ...furtherSearchResults];
+          }
+        }
+      }
+    }
+  }
+  if (neighborCount < 2) {
+    return [];
+  }
+  if (discoveredDots.length === 0) {
+    if (hasBackloop === true) {
+      return [start];
+    }
+    return [];
+  }
+  return [start, ...discoveredDots];
 }
 
 const findCircles = (computedDots, start) => {
@@ -208,14 +260,30 @@ const findCircles = (computedDots, start) => {
   }
 
   // 2. discover all connected dots
-  const dotsInvolved = listToHashmap(getDotsInvolved(computedDots, start));
+  const dotsInvolved = listToHashmap(discoverInvolved(computedDots, start, start));
+  console.log(dotsInvolved);
   // 3. get starting position
   const firstXSegment = Object.keys(dotsInvolved)[0];
   const firstYSegment = Object.keys(dotsInvolved[firstXSegment]).sort((a, b) => parseInt(a) - parseInt(b))[0];
 
   // 4. run one circle on border
   const startPoint = dotsInvolved[firstXSegment][firstYSegment];
-  return circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
+  const circleWithTwowayLines = circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
+
+  // const outCircles = [];
+  // const edgeList = [];
+  // const tmpCircle = [];
+  // for (let index = 0; index < circleWithTwowayLines.length; index += 1) {
+  //   const currentPoint = circleWithTwowayLines[index];
+  //   const nextPoint =  circleWithTwowayLines[(index + 1) % circleWithTwowayLines.length];
+  //   const edge = [currentPoint, nextPoint].sort((a, b) => (a.x + a.y) - (b.x + b.y));
+  //   if (edgeList.indexOf(edge) !== -1) {
+  //     // Dublicate Edge
+  //   }
+
+  // }
+  // circleWithTwowayLines
+  return circleWithTwowayLines
 }
 
 const isLeft = (direction) => {
@@ -301,7 +369,7 @@ document.getElementById('background').addEventListener('mousemove', e => {
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
   calculatePlayerPos(playerDot, offsetX, offsetY, lastMouseX, lastMouseY);
-  mouse.translation.set(lastMouseX, lastMouseY);
+  // mouse.translation.set(lastMouseX, lastMouseY);
 });
 
 document.getElementById('background').addEventListener('mousedown', e => {
@@ -341,7 +409,7 @@ document.getElementById('background').addEventListener('mousedown', e => {
   
     const resultCircle = findCircles(computedDots, newDot);
   
-    if (resultCircle) {
+    if (resultCircle && resultCircle.length > 3) {
       invalidateCircled(computedDots, resultCircle);
       const vertices = resultCircle.path.map((routElement) => new Two.Vector((routElement.x - resultCircle.path[0].x) * 32, (routElement.y - resultCircle.path[0].y) * 32));
       var path = new Two.Path(vertices, true, false);
