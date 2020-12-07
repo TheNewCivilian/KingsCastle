@@ -7,20 +7,29 @@
       <label for="username_input" class="subtitle">
         Username
       </label>
-      <input id="username_input" type="text"/>
+      <input id="username_input" type="text" v-model="username"/>
     </div>
     <div class="section">
       <span class="subtitle">Host Game</span>
-      <div class="row description">
-        <span>Points:</span>
-        <span>{{rounds}}</span>
+      <div class="settings-container">
+        <div class="row description">
+          <span>Points:</span>
+          <span>{{rounds}}</span>
+        </div>
+        <!-- <input type="range" min="100" max="1000" v-model="rounds"> -->
+        <Slider :min="100" :max="1000" v-model="rounds"/>
       </div>
-      <input type="range" min="100" max="1000" v-model="rounds">
-      <div class="row">
+      <div class="row settings-container">
         <label for="round_private" class="description">
           Private
         </label>
-        <input id="round_private" type="checkbox"/>
+        <Checkbox
+          id="round_private"
+          class="checkbox"
+          type="checkbox"
+          v-model="privateSession"
+          color="#FF8C42"
+        />
       </div>
       <button class="button button--orange">Host</button>
     </div>
@@ -34,10 +43,34 @@
 </template>
 
 <script>
+import Checkbox from 'vue-material-checkbox';
+import usernames from '../assets/usernames.json';
+import Slider from './util/Slider.vue';
+
+const choose = (choices) => {
+  const index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+};
+
 export default {
-  data: () => ({
-    rounds: 100,
-  }),
+  components: {
+    Slider,
+    Checkbox,
+  },
+  data() {
+    return {
+      rounds: 100,
+      privateSession: false,
+      username: this.generateUsername(),
+    };
+  },
+  methods: {
+    generateUsername() {
+      const name = `${choose(usernames.first)}${choose(usernames.second)}${Math.floor(Math.random() * 10)}`;
+      console.log(name);
+      return name;
+    },
+  },
 };
 </script>
 
@@ -45,6 +78,14 @@ export default {
 .row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.settings-container {
+  margin-top: 10px;
+  border: 2px solid gainsboro;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 .description {
@@ -99,12 +140,21 @@ input {
   padding: 12px 20px;
   box-sizing: border-box;
   font-size: 20px;
-  color:  gray;
+  color:  rgb(175, 175, 175);
 }
 
 input[type=text] {
-  border: 1px solid grey;
+  border: 2px solid gainsboro;
   border-radius: 10px;
+}
+
+#username_session {
+  text-align: center;
+}
+
+.checkbox {
+  width: 40px;
+  margin: 0;
 }
 
 .button {

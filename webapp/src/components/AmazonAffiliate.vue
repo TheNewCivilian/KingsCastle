@@ -68,6 +68,7 @@ export default {
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
+  pointer-events: all;
 }
 
 .subtitle {

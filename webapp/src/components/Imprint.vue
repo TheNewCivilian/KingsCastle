@@ -59,6 +59,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: all;
   }
   .container {
     position: absolute;
@@ -73,6 +74,7 @@ export default {
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
+    pointer-events: all;
   }
   .profile {
     height: 100px;
