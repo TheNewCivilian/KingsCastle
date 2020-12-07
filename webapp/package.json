@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "two.js": "^0.7.0-stable.1",
     "vue": "^2.6.11",
     "vue-material-checkbox": "^2.2.0",
     "vue-material-design-icons": "^4.11.0",

@@ -135,19 +135,6 @@ export default {
   margin-bottom: 10px;
 }
 
-input {
-  font-family: 'Balsamiq Sans', cursive;
-  padding: 12px 20px;
-  box-sizing: border-box;
-  font-size: 20px;
-  color:  rgb(175, 175, 175);
-}
-
-input[type=text] {
-  border: 2px solid gainsboro;
-  border-radius: 10px;
-}
-
 #username_session {
   text-align: center;
 }
