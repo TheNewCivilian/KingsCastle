@@ -13,4 +13,8 @@ body, html, #app {
   font-family: 'Balsamiq Sans', cursive;
 }
 
+button {
+  cursor: pointer;
+}
+
 </style>
