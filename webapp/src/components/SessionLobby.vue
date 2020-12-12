@@ -6,7 +6,7 @@
     </span>
     <span class="title">Session Id:</span>
     <div class="row">
-      <input type="text" ref="sessionKey" id="sessionKey" readonly :value="sessionKey">
+      <input type="text" ref="sessionId" id="sessionId" readonly :value="sessionId">
       <button class="copy-button" @click="copySessionKey">
         <CopyIcon />
       </button>
@@ -19,16 +19,18 @@ import CopyIcon from 'vue-material-design-icons/ContentCopy.vue';
 import LoaderIcon from 'vue-material-design-icons/Loading.vue';
 
 export default {
-  props: {
-    sessionKey: String,
-  },
   components: {
     LoaderIcon,
     CopyIcon,
   },
+  computed: {
+    sessionId() {
+      return this.$store.getters.sessionId;
+    },
+  },
   methods: {
     copySessionKey() {
-      const copyText = this.$refs.sessionKey;
+      const copyText = this.$refs.sessionId;
       copyText.select();
       copyText.setSelectionRange(0, 99999);
       document.execCommand('copy');
@@ -57,9 +59,10 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
-#sessionKey {
+#sessionId {
   text-align: center;
 }
 

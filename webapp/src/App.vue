@@ -4,6 +4,25 @@
   </div>
 </template>
 
+<script>
+import WS from './api/ws';
+
+export default {
+  created() {
+    this.$options.sockets.onmessage = this.onMessage;
+  },
+  methods: {
+    onMessage(recievedMessage) {
+      WS.onResponse(
+        this.$store,
+        this.$router,
+        recievedMessage,
+      );
+    },
+  },
+};
+</script>
+
 <style lang="scss">
 body, html, #app {
   width: 100%;
@@ -30,6 +49,27 @@ input {
 input[type=text] {
   border: 2px solid gainsboro;
   border-radius: 10px;
+}
+
+input[type=range] {
+  padding: 0;
+}
+
+.button {
+  margin-top: 10px;
+  background-color: #48A9A6;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0px 0px 11px -2px rgba(0,0,0,0.2);
+  padding: 10px 20px;
+  color: white;
+  font-size: 20px;
+  font-family: 'Balsamiq Sans', cursive;
+  text-decoration: none;
+
+  &__primary {
+    background-color: #FF8C42;
+  }
 }
 
 </style>

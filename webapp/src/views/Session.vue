@@ -1,16 +1,38 @@
 <template>
   <div class="session">
-    <Playground :points="[]"/>
-    <SessionLobby sessionKey="21318" />
+    <Playground />
+    <SessionLobby v-if="!allUsersPresent" />
+    <SessionHead />
+    <ResultPopup v-if="false"/>
   </div>
 </template>
 
 <script>
 import Playground from '../components/Playground.vue';
+import ResultPopup from '../components/ResultPopup.vue';
+import SessionHead from '../components/SessionHead.vue';
 import SessionLobby from '../components/SessionLobby.vue';
 
 export default {
-  components: { Playground, SessionLobby },
+  components: {
+    Playground,
+    SessionHead,
+    SessionLobby,
+    ResultPopup,
+  },
+  computed: {
+    joined() {
+      return this.$store.getters.joined;
+    },
+    allUsersPresent() {
+      return this.$store.getters.allUsersPresent;
+    },
+  },
+  mounted() {
+    if (!this.joined) {
+      this.$router.push({ name: 'Lobby', params: { sessionId: this.$route.query.sid } });
+    }
+  },
 };
 </script>
 

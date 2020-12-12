@@ -13,15 +13,10 @@
 <script>
 import AmazonAffiliate from '../components/AmazonAffiliate.vue';
 import MainMenu from '../components/MainMenu.vue';
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
 
 export default {
   components: { MainMenu, AmazonAffiliate },
   name: 'Home',
-  // components: {
-  //   HelloWorld,
-  // },
 };
 </script>
 

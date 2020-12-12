@@ -165,20 +165,7 @@ const findCircles = (computedDots, start) => {
   // 4. run one circle on border
   const startPoint = dotsInvolved[firstXSegment][firstYSegment];
   const circleWithTwowayLines = circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
-
-  // const outCircles = [];
-  // const edgeList = [];
-  // const tmpCircle = [];
-  // for (let index = 0; index < circleWithTwowayLines.length; index += 1) {
-  //   const currentPoint = circleWithTwowayLines[index];
-  //   const nextPoint =  circleWithTwowayLines[(index + 1) % circleWithTwowayLines.length];
-  //   const edge = [currentPoint, nextPoint].sort((a, b) => (a.x + a.y) - (b.x + b.y));
-  //   if (edgeList.indexOf(edge) !== -1) {
-  //     // Dublicate Edge
-  //   }
-
-  // }
-  // circleWithTwowayLines
+  
   return circleWithTwowayLines
 }
 

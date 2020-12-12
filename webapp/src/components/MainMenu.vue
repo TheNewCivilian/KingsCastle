@@ -31,19 +31,25 @@
           color="#FF8C42"
         />
       </div>
-      <button class="button button--orange">Host</button>
+      <button class="button button--orange" @click="host">Host</button>
     </div>
     <div class="section">
       <span class="subtitle">Join Game</span>
       <span class="description">Join a randome game with no code.</span>
-      <input id="username_session" type="text" placeholder="Session Code - XXXX"/>
-      <button class="button">Join</button>
+      <input
+        id="username_session"
+        type="text"
+        v-model="sessionId"
+        placeholder="Session Code - XXXX"
+      />
+      <button class="button" @click="join">Join</button>
     </div>
   </div>
 </template>
 
 <script>
 import Checkbox from 'vue-material-checkbox';
+import WS from '@/api/ws';
 import usernames from '../assets/usernames.json';
 import Slider from './util/Slider.vue';
 
@@ -62,13 +68,35 @@ export default {
       rounds: 100,
       privateSession: false,
       username: this.generateUsername(),
+      sessionId: '',
     };
+  },
+  created() {
+    console.log(this.$route.params);
+    if (this.$route.params && this.$route.params.sessionId) {
+      this.sessionId = this.$route.params.sessionId;
+    }
   },
   methods: {
     generateUsername() {
       const name = `${choose(usernames.first)}${choose(usernames.second)}${Math.floor(Math.random() * 10)}`;
       console.log(name);
       return name;
+    },
+    join() {
+      // TODO VALIDATE USERNAME
+      WS.sendJoin(this.$socket, {
+        sessionId: this.sessionId,
+        username: this.username,
+      });
+    },
+    host() {
+      WS.sendJoin(this.$socket, {
+        sessionId: this.sessionId,
+        username: this.username,
+        private: this.privateSession,
+        dotCount: this.rounds,
+      });
     },
   },
 };

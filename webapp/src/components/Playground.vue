@@ -22,6 +22,22 @@ export default {
       two: null,
     };
   },
+  computed: {
+    isPlayersTurn() {
+      return this.$store.getters.isPlayersTurn;
+    },
+  },
+  watch: {
+    // TODO FIX Player shown
+    isPlayersTurn(newValue) {
+      console.log(newValue);
+      if (newValue) {
+        this.two.remove(this.playerDot);
+      } else {
+        this.two.add(this.playerDot);
+      }
+    },
+  },
   mounted() {
     // Check if session exists
     // return to home
@@ -41,6 +57,7 @@ export default {
     }, { passive: true });
 
     window.addEventListener('keydown', (e) => this.moveBoard(e));
+    this.$refs.playground.addEventListener('mousedown', (e) => this.placePoint(e));
   },
   methods: {
     mouseMove(e) {
@@ -49,20 +66,25 @@ export default {
       this.calculatePlayerPos();
     },
     navigateBoard() {
-      this.displayedDots.forEach((dot) => {
-        if (dot.invalid) {
-          dot.visual.fill = '#fff'; // eslint-disable-line no-param-reassign
-        }
-        this.calculatePointPos(dot.visual, dot.x, dot.y);
-      });
-      this.displayedPaths.forEach((path) => {
-        this.calculatePointPos(path.visual, path.x, path.y);
-      });
-      // zero.translation.set(16 + offsetX, 16 + offsetY);
-      const backgroundXOffset = Math.round(this.offsetX % 32);
-      const backgroundYOffset = Math.round(this.offsetY % 32);
-      this.$refs.playground.style.backgroundPositionX = `${backgroundXOffset}px`;
-      this.$refs.playground.style.backgroundPositionY = `${backgroundYOffset}px`;
+      if (this.$refs && this.$refs.playground) {
+        this.displayedDots.forEach((dot) => {
+          if (dot.invalid) {
+            dot.visual.fill = '#fff'; // eslint-disable-line no-param-reassign
+          }
+          this.calculatePointPos(dot.visual, dot.x, dot.y);
+        });
+        this.displayedPaths.forEach((path) => {
+          this.calculatePointPos(path.visual, path.x, path.y);
+        });
+        // zero.translation.set(16 + offsetX, 16 + offsetY);
+        const backgroundXOffset = Math.round(this.offsetX % 32);
+        const backgroundYOffset = Math.round(this.offsetY % 32);
+        this.$refs.playground.style.backgroundPositionX = `${backgroundXOffset}px`;
+        this.$refs.playground.style.backgroundPositionY = `${backgroundYOffset}px`;
+      }
+    },
+    placePoint() {
+
     },
     calculatePlayerPos() {
       const xPos = Math.floor((this.lastMouseX - this.offsetX) / 32);

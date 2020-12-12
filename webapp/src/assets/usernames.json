@@ -21,7 +21,9 @@
     "Staking",
     "Sweet",
     "Super",
-    "Handsome"
+    "Handsome",
+    "Angry",
+    "Furious"
   ],
   "second": [
     "Wind",
@@ -37,6 +39,14 @@
     "Caesar",
     "Kaiser",
     "Sultan",
-    "Archduke"
+    "Archduke",
+    "Sultana",
+    "Prince",
+    "Princess",
+    "Knight",
+    "General",
+    "Master",
+    "Duke",
+    "Bishop"
   ]
 }
