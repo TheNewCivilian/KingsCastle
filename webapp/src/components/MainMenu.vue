@@ -92,7 +92,6 @@ export default {
     },
     host() {
       WS.sendJoin(this.$socket, {
-        sessionId: this.sessionId,
         username: this.username,
         private: this.privateSession,
         dotCount: this.rounds,

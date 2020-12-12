@@ -7,7 +7,9 @@
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
 import Two from 'two.js';
+import ws from '../api/ws';
 
 export default {
   data() {
@@ -16,8 +18,8 @@ export default {
       offsetY: 0,
       lastMouseX: 0,
       lastMouseY: 0,
-      displayedDots: [],
-      displayedPaths: [],
+      // displayedDots: [],
+      // displayedPaths: [],
       playerDot: null,
       two: null,
     };
@@ -26,16 +28,25 @@ export default {
     isPlayersTurn() {
       return this.$store.getters.isPlayersTurn;
     },
+    dots() {
+      return this.$store.getters.dots;
+    },
+    polygons() {
+      return this.$store.getters.polygons;
+    },
   },
   watch: {
     // TODO FIX Player shown
     isPlayersTurn(newValue) {
       console.log(newValue);
       if (newValue) {
-        this.two.remove(this.playerDot);
-      } else {
         this.two.add(this.playerDot);
+      } else {
+        this.two.remove(this.playerDot);
       }
+    },
+    dots() {
+      this.navigateBoard();
     },
   },
   mounted() {
@@ -48,6 +59,11 @@ export default {
     }).appendTo(this.$refs.playground);
 
     this.playerDot = this.two.makeCircle(0, 0, 5, 5);
+    if (this.isPlayersTurn) {
+      this.two.add(this.playerDot);
+    } else {
+      this.two.remove(this.playerDot);
+    }
 
     window.addEventListener('wheel', (e) => {
       const translationY = e.deltaY * 5;
@@ -57,7 +73,7 @@ export default {
     }, { passive: true });
 
     window.addEventListener('keydown', (e) => this.moveBoard(e));
-    this.$refs.playground.addEventListener('mousedown', (e) => this.placePoint(e));
+    this.$refs.playground.addEventListener('mousedown', () => this.placePoint());
   },
   methods: {
     mouseMove(e) {
@@ -67,16 +83,40 @@ export default {
     },
     navigateBoard() {
       if (this.$refs && this.$refs.playground) {
-        this.displayedDots.forEach((dot) => {
+        this.dots.forEach((dot) => {
+          if (!dot.visual) {
+            dot.visual = this.two.makeCircle(0, 0, 5, 5);
+            if (dot.party === 'userA') {
+              dot.visual.fill = '#FCAF58';
+              dot.visual.stroke = '#FF8C42';
+              dot.visual.linewidth = 2;
+            } else {
+              dot.visual.fill = '#70C2BF';
+              dot.visual.stroke = '#48A9A6';
+              dot.visual.linewidth = 2;
+            }
+          }
           if (dot.invalid) {
             dot.visual.fill = '#fff'; // eslint-disable-line no-param-reassign
           }
           this.calculatePointPos(dot.visual, dot.x, dot.y);
         });
-        this.displayedPaths.forEach((path) => {
-          this.calculatePointPos(path.visual, path.x, path.y);
+        this.polygons.forEach((polygon) => {
+          console.log(polygon);
+          if (!polygon.visual) {
+            const vertices = polygon.vertices.map(
+              (routElement) => new Two.Vector(
+                (routElement.x - polygon.vertices[0].x) * 32,
+                (routElement.y - polygon.vertices[0].y) * 32,
+              ),
+            );
+            polygon.visual = this.two.makePath(vertices, true, false);
+            polygon.visual.stroke = polygon.party === 'userA' ? '#FF8C42' : '#48A9A6';
+            polygon.visual.fill = 'transparent';
+            polygon.visual.linewidth = 4;
+          }
+          this.calculatePointPos(polygon.visual, polygon.x + 1, polygon.y);
         });
-        // zero.translation.set(16 + offsetX, 16 + offsetY);
         const backgroundXOffset = Math.round(this.offsetX % 32);
         const backgroundYOffset = Math.round(this.offsetY % 32);
         this.$refs.playground.style.backgroundPositionX = `${backgroundXOffset}px`;
@@ -84,7 +124,11 @@ export default {
       }
     },
     placePoint() {
-
+      if (this.isPlayersTurn) {
+        const xPos = Math.floor((this.lastMouseX - this.offsetX) / 32);
+        const yPos = Math.floor((this.lastMouseY - this.offsetY) / 32);
+        ws.sendTurn(this.$socket, { xPos, yPos });
+      }
     },
     calculatePlayerPos() {
       const xPos = Math.floor((this.lastMouseX - this.offsetX) / 32);

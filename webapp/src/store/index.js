@@ -26,10 +26,26 @@ export default new Vuex.Store({
     SET_SESSION(currentState, payload) {
       currentState.session = payload;
     },
+    ADD_TURN(currentState, payload) {
+      currentState.session.dots = [...currentState.session.dots, {
+        ...payload.newDot,
+        visual: null,
+      }];
+      if (payload.newPolygon) {
+        currentState.session.polygons = [...currentState.session.polygons, {
+          ...payload.newPolygon,
+          visual: null,
+        }];
+      }
+      currentState.session.currentUsersTurn = payload.currentUsersTurn;
+    },
   },
   actions: {
     initSession(context, payload) {
       context.commit('SET_SESSION', payload);
+    },
+    addTurn(context, payload) {
+      context.commit('ADD_TURN', payload);
     },
   },
   getters: {
@@ -62,6 +78,12 @@ export default new Vuex.Store({
     },
     isPlayersTurn(currentState) {
       return currentState.session.currentUsersTurn === currentState.session.userId;
+    },
+    dots(currentState) {
+      return currentState.session.dots;
+    },
+    polygons(currentState) {
+      return currentState.session.polygons;
     },
   },
 });

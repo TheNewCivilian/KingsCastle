@@ -156,8 +156,8 @@ const findCircles = (computedDots, start) => {
   }
 
   // 2. discover all connected dots
-  const dotsInvolved = listToHashmap(discoverInvolved(computedDots, start, start));
-  console.log(dotsInvolved);
+  const discoveredDots = discoverInvolved(computedDots, start, start);
+  const dotsInvolved = listToHashmap(discoveredDots);
   // 3. get starting position
   const firstXSegment = Object.keys(dotsInvolved)[0];
   const firstYSegment = Object.keys(dotsInvolved[firstXSegment]).sort((a, b) => parseInt(a) - parseInt(b))[0];
@@ -165,7 +165,6 @@ const findCircles = (computedDots, start) => {
   // 4. run one circle on border
   const startPoint = dotsInvolved[firstXSegment][firstYSegment];
   const circleWithTwowayLines = circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
-  
   return circleWithTwowayLines
 }
 
@@ -247,3 +246,8 @@ const invalidateCircled = (computedDots, resultCircle) => {
     });
   })
 }
+
+module.exports = {
+  findCircles,
+  invalidateCircled,
+};

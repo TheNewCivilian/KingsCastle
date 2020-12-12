@@ -3,6 +3,11 @@ const {
   randomString,
 } = require('./methods');
 
+const {
+  findCircles,
+  invalidateCircled,
+} = require('./helpers');
+
 sessions = {};
 archive = [];
 
@@ -122,13 +127,22 @@ const turn = (data, connection) => {
   const newDot = {
     x: data.xPos,
     y: data.yPos,
-    party: connection.userId,
+    party: connection.userId === currentSession.userA ? 'userA' : 'userB',
     invalid: false,
   };
-  if (!computedDots[xPos]) {
-    computedDots[xPos] = {};
+  if (!computedDots[data.xPos]) {
+    computedDots[data.xPos] = {};
   }
-  computedDots[xPos][yPos] = newDot;
+  if (computedDots[data.xPos][data.yPos]) {
+    return {
+      type: 'ERROR',
+      message: {
+        error: true,
+        message: 'Point already present',
+      }
+    }
+  }
+  computedDots[data.xPos][data.yPos] = newDot;
 
   const resultCircle = findCircles(computedDots, newDot);
 
@@ -136,8 +150,13 @@ const turn = (data, connection) => {
 
   if (resultCircle && resultCircle.length > 3) {
     invalidateCircled(computedDots, resultCircle);
-    const vertices = resultCircle.path.map((routElement) => new Two.Vector((routElement.x - resultCircle.path[0].x) * 32, (routElement.y - resultCircle.path[0].y) * 32));
-    newPolygon = { vertecies: vertices, party: connection.userId };
+    const vertices = resultCircle.path;
+    newPolygon = {
+      vertices: vertices,
+      x: resultCircle.path[0].x,
+      y: resultCircle.path[0].y,
+      party: connection.userId === currentSession.userA ? 'userA' : 'userB',
+    };
     currentSession.polygons.push(newPolygon);
   }
 
