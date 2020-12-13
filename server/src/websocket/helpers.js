@@ -165,7 +165,7 @@ const findCircles = (computedDots, start) => {
   // 4. run one circle on border
   const startPoint = dotsInvolved[firstXSegment][firstYSegment];
   const circleWithTwowayLines = circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
-  return circleWithTwowayLines
+  return circleWithTwowayLines;
 }
 
 const isLeft = (direction) => {
@@ -229,15 +229,10 @@ const invalidateCircled = (computedDots, resultCircle) => {
             computedDots[point.x] = {};
           }
           // Create point if needed
-          let newDotVisual = two.makeCircle(0, 0, 5, 5);
-          newDotVisual.fill = '#70C2BF';
-          newDotVisual.stroke = '#48A9A6';
-          newDotVisual.linewidth = 2;
           const newDot = {
             x: point.x,
             y: yPos,
             party: -1,
-            visual: newDotVisual,
             invalid: true,
           };
           computedDots[point.x][yPos] = newDot;

@@ -42,6 +42,12 @@ const onResponse = (store, router, response) => {
   if (data.method === 'SESSION_UPDATE') {
     store.dispatch('addTurn', data.payload);
   }
+  if (data.method === 'CONNECT') {
+    store.dispatch('connect');
+  }
+  if (data.method === 'DISCONNECT') {
+    store.dispatch('disconnect');
+  }
 };
 
 export default {

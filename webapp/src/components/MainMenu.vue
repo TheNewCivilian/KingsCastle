@@ -31,7 +31,12 @@
           color="#FF8C42"
         />
       </div>
-      <button class="button button--orange" @click="host">Host</button>
+      <button class="button button--orange" @click="host">
+        <span v-if="connected">Host</span>
+        <div class="loader" v-else>
+          <LoaderIcon :size="20"/>
+        </div>
+      </button>
     </div>
     <div class="section">
       <span class="subtitle">Join Game</span>
@@ -42,13 +47,19 @@
         v-model="sessionId"
         placeholder="Session Code - XXXX"
       />
-      <button class="button" @click="join">Join</button>
+      <button class="button" @click="join">
+        <span v-if="connected">Join</span>
+        <div class="loader" v-else>
+          <LoaderIcon :size="20"/>
+        </div>
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import Checkbox from 'vue-material-checkbox';
+import LoaderIcon from 'vue-material-design-icons/Loading.vue';
 import WS from '@/api/ws';
 import usernames from '../assets/usernames.json';
 import Slider from './util/Slider.vue';
@@ -62,6 +73,7 @@ export default {
   components: {
     Slider,
     Checkbox,
+    LoaderIcon,
   },
   data() {
     return {
@@ -70,6 +82,11 @@ export default {
       username: this.generateUsername(),
       sessionId: '',
     };
+  },
+  computed: {
+    connected() {
+      return this.$store.getters.connected;
+    },
   },
   created() {
     console.log(this.$route.params);
@@ -84,24 +101,34 @@ export default {
       return name;
     },
     join() {
-      // TODO VALIDATE USERNAME
-      WS.sendJoin(this.$socket, {
-        sessionId: this.sessionId,
-        username: this.username,
-      });
+      if (this.connected) {
+        // TODO VALIDATE USERNAME
+        WS.sendJoin(this.$socket, {
+          sessionId: this.sessionId,
+          username: this.username,
+        });
+      }
     },
     host() {
-      WS.sendJoin(this.$socket, {
-        username: this.username,
-        private: this.privateSession,
-        dotCount: this.rounds,
-      });
+      if (this.connected) {
+        WS.sendJoin(this.$socket, {
+          username: this.username,
+          private: this.privateSession,
+          dotCount: this.rounds,
+        });
+      }
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+
+.loader {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 .row {
   display: flex;
   justify-content: space-between;

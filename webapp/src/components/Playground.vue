@@ -18,8 +18,6 @@ export default {
       offsetY: 0,
       lastMouseX: 0,
       lastMouseY: 0,
-      // displayedDots: [],
-      // displayedPaths: [],
       playerDot: null,
       two: null,
     };
@@ -38,7 +36,6 @@ export default {
   watch: {
     // TODO FIX Player shown
     isPlayersTurn(newValue) {
-      console.log(newValue);
       if (newValue) {
         this.two.add(this.playerDot);
       } else {
@@ -50,9 +47,6 @@ export default {
     },
   },
   mounted() {
-    // Check if session exists
-    // return to home
-    console.log(this.$refs.playground);
     this.two = new Two({
       fullscreen: true,
       autostart: true,
@@ -102,7 +96,6 @@ export default {
           this.calculatePointPos(dot.visual, dot.x, dot.y);
         });
         this.polygons.forEach((polygon) => {
-          console.log(polygon);
           if (!polygon.visual) {
             const vertices = polygon.vertices.map(
               (routElement) => new Two.Vector(
@@ -110,12 +103,13 @@ export default {
                 (routElement.y - polygon.vertices[0].y) * 32,
               ),
             );
-            polygon.visual = this.two.makePath(vertices, true, false);
+            polygon.visual = new Two.Path(vertices, true, false);
+            this.two.add(polygon.visual);
             polygon.visual.stroke = polygon.party === 'userA' ? '#FF8C42' : '#48A9A6';
             polygon.visual.fill = 'transparent';
             polygon.visual.linewidth = 4;
           }
-          this.calculatePointPos(polygon.visual, polygon.x + 1, polygon.y);
+          this.calculatePointPos(polygon.visual, polygon.x, polygon.y);
         });
         const backgroundXOffset = Math.round(this.offsetX % 32);
         const backgroundYOffset = Math.round(this.offsetY % 32);

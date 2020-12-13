@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     userName: '',
+    connected: false,
     session: {
       userId: '',
       sessionId: '',
@@ -39,6 +40,9 @@ export default new Vuex.Store({
       }
       currentState.session.currentUsersTurn = payload.currentUsersTurn;
     },
+    SET_CONNECTED(currentState, payload) {
+      currentState.connected = payload;
+    },
   },
   actions: {
     initSession(context, payload) {
@@ -46,6 +50,12 @@ export default new Vuex.Store({
     },
     addTurn(context, payload) {
       context.commit('ADD_TURN', payload);
+    },
+    connect(context) {
+      context.commit('SET_CONNECTED', true);
+    },
+    disconnect(context) {
+      context.commit('SET_CONNECTED', false);
     },
   },
   getters: {
@@ -84,6 +94,9 @@ export default new Vuex.Store({
     },
     polygons(currentState) {
       return currentState.session.polygons;
+    },
+    connected(currentState) {
+      return currentState.connected;
     },
   },
 });

@@ -44,7 +44,7 @@ export default {
   font-size: 40px;
 }
 .loader {
-  animation:spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
