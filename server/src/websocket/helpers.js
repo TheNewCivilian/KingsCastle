@@ -185,6 +185,7 @@ const isTop = (direction) => {
 // }
 
 const invalidateCircled = (computedDots, resultCircle) => {
+  let pointsMade = 0;
   const positionedResultCircle = {};
   resultCircle.path.forEach((point) => {
     if (!positionedResultCircle[point.x]) {
@@ -222,6 +223,9 @@ const invalidateCircled = (computedDots, resultCircle) => {
 
           if (computedDots[point.x]) {
             if (computedDots[point.x][yPos]) {
+              if (!computedDots[point.x][yPos].invalid && computedDots[point.x][yPos].party !== resultCircle.path[0].party) {
+                pointsMade += 1;
+              }
               computedDots[point.x][yPos].invalid = true;
               continue;
             }
@@ -240,6 +244,7 @@ const invalidateCircled = (computedDots, resultCircle) => {
       }
     });
   })
+  return pointsMade;
 }
 
 module.exports = {

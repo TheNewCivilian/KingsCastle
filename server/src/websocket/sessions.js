@@ -144,12 +144,23 @@ const turn = (data, connection) => {
   }
   computedDots[data.xPos][data.yPos] = newDot;
 
+  if (connection.userId === currentSession.userB) {
+    currentSession.pointsLeft -= 1;
+    // TODO END GAME HERE
+  }
+
   const resultCircle = findCircles(computedDots, newDot);
 
   let newPolygon;
 
   if (resultCircle && resultCircle.length > 3) {
-    invalidateCircled(computedDots, resultCircle);
+    const pointsMade = invalidateCircled(computedDots, resultCircle);
+    if (connection.userId === currentSession.userA) {
+      currentSession.pointsA += pointsMade;
+    } else {
+      currentSession.pointsB += pointsMade;
+    }
+
     const vertices = resultCircle.path;
     newPolygon = {
       vertices: vertices,
@@ -174,6 +185,9 @@ const turn = (data, connection) => {
       currentUsersTurn: currentSession.currentUsersTurn,
       newDot: newDot,
       newPolygon: newPolygon,
+      pointsLeft: currentSession.pointsLeft,
+      pointsB: currentSession.pointsB,
+      pointsA: currentSession.pointsA,
     },
   };
 };

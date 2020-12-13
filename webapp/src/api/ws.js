@@ -33,8 +33,6 @@ const sendTurn = (socket, data) => {
 
 const onResponse = (store, router, response) => {
   const data = JSON.parse(response.data);
-  console.log(data);
-  console.log(data.payload);
   if (data.method === 'SESSION_INIT') {
     store.dispatch('initSession', data.payload);
     router.push({ name: 'Session', query: { sid: data.payload.sessionId } });

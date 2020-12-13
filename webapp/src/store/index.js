@@ -39,6 +39,9 @@ export default new Vuex.Store({
         }];
       }
       currentState.session.currentUsersTurn = payload.currentUsersTurn;
+      currentState.session.pointsLeft = payload.pointsLeft;
+      currentState.session.pointsA = payload.pointsA;
+      currentState.session.pointsB = payload.pointsB;
     },
     SET_CONNECTED(currentState, payload) {
       currentState.connected = payload;
