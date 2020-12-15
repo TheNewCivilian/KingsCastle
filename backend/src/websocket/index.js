@@ -62,7 +62,7 @@ const onMessage = (websocket, connection, message) => {
 
 const onClose = (websocket, connection) => {
   console.log("connection Closed");
-  sendResponse(connection, websocket, session.surrender(connection));
+  // sendResponse(connection, websocket, session.surrender(connection));
 };
 
 module.exports = {

@@ -1,9 +1,9 @@
 <template>
   <div class="home">
     <div class="video-container">
-      <video autoplay muted loop>
+      <!-- <video muted loop>
         <source src='../assets/game_sample.webm' type="video/webm" >
-      </video>
+      </video> -->
     </div>
     <main-menu />
     <amazon-affiliate />
@@ -29,6 +29,7 @@ export default {
   width: 100vw;
   height: 100vh;
   z-index: -1;
+  background-color: black;
 }
 .video-container > video {
   display: block;

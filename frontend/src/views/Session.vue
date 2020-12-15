@@ -2,7 +2,7 @@
   <div class="session">
     <Playground />
     <SessionLobby v-if="!allUsersPresent" />
-    <SessionHead />
+    <!-- <SessionHead /> -->
     <ResultPopup v-if="finished" :success="winner"/>
   </div>
 </template>
@@ -10,13 +10,13 @@
 <script>
 import Playground from '../components/Playground.vue';
 import ResultPopup from '../components/ResultPopup.vue';
-import SessionHead from '../components/SessionHead.vue';
+// import SessionHead from '../components/SessionHead.vue';
 import SessionLobby from '../components/SessionLobby.vue';
 
 export default {
   components: {
     Playground,
-    SessionHead,
+    // SessionHead,
     SessionLobby,
     ResultPopup,
   },

@@ -31,7 +31,7 @@ const join = (data, connection) => {
         selectedSession.userB = connection.userId;
         selectedSession.userBUsername = connection.username;
       } else {
-        selectedSession.spactaters.push(connection.userId)
+        selectedSession.spectators.push(connection.userId)
       }
       connection.sessionId = data.sessionId;
       return {
@@ -150,7 +150,7 @@ const turn = (data, connection) => {
     // TODO END GAME HERE
     if (currentSession.pointsLeft <= 0) {
       archive.push(currentSession);
-      let winner = connection.pointsA > currentSession.userB ? currentSession.userA : currentSession.userB;
+      let winner = currentSession.pointsA > currentSession.userB ? currentSession.userA : currentSession.userB;
       if (connection.pointsA == currentSession.userB) {
         winner = 'none';
       }
