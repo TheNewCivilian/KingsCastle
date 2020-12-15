@@ -201,7 +201,6 @@ const invalidateCircled = (computedDots, resultCircle) => {
   Object.keys(positionedResultCircle).forEach((xSegment) => {
     const sortedYSegment = positionedResultCircle[xSegment].sort((a, b) => a.y - b.y);
     // Iterating from top to bottom
-    // console.log(sortedYSegment)
     sortedYSegment.forEach((point) => {
       // Ignore if a path node is below
       if (
@@ -210,17 +209,10 @@ const invalidateCircled = (computedDots, resultCircle) => {
         || (isTop(point.in) && isLeft(point.out)) //|| isRight(point.out)))
         
       ) {
-
-        // console.log(point);
-        // console.log(positionedResultCircle);
-        // console.log(sortedYSegment);
         const pointBeneath = sortedYSegment[sortedYSegment.indexOf(point) + 1];
      
         // invalidate all points / set new between point & pointBeneath
         for (let yPos = point.y + 1; yPos < pointBeneath.y; yPos += 1) {
-          // console.log("invalidate");
-          // console.log(`${point.x},${yPos}`);
-
           if (computedDots[point.x]) {
             if (computedDots[point.x][yPos]) {
               if (!computedDots[point.x][yPos].invalid && computedDots[point.x][yPos].party !== resultCircle.path[0].party) {

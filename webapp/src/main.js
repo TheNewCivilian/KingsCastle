@@ -5,7 +5,7 @@ import router from './router';
 import store from './store';
 
 Vue.config.productionTip = false;
-Vue.use(VueNativeSock, 'ws://localhost:3000', { reconnection: true, format: 'json' });
+Vue.use(VueNativeSock, 'ws://192.168.178.61:3000', { reconnection: true, format: 'json' });
 
 new Vue({
   router,

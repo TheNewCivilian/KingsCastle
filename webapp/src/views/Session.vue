@@ -3,7 +3,7 @@
     <Playground />
     <SessionLobby v-if="!allUsersPresent" />
     <SessionHead />
-    <ResultPopup v-if="false"/>
+    <ResultPopup v-if="finished" :success="winner"/>
   </div>
 </template>
 
@@ -26,6 +26,12 @@ export default {
     },
     allUsersPresent() {
       return this.$store.getters.allUsersPresent;
+    },
+    finished() {
+      return this.$store.getters.finished;
+    },
+    winner() {
+      return this.$store.getters.winner;
     },
   },
   mounted() {

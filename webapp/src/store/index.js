@@ -4,26 +4,35 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+const emptySession = {
+  userId: '',
+  sessionId: '',
+  dots: [],
+  polygons: [],
+  pointsA: 0,
+  pointsB: 0,
+  pointsLeft: 0,
+  userA: '',
+  userAUsername: '',
+  userB: '',
+  userBUsername: '',
+  currentUsersTurn: '',
+};
+
 export default new Vuex.Store({
   state: {
     userName: '',
     connected: false,
-    session: {
-      userId: '',
-      sessionId: '',
-      dots: [],
-      polygons: [],
-      pointsA: 0,
-      pointsB: 0,
-      pointsLeft: 0,
-      userA: '',
-      userAUsername: '',
-      userB: '',
-      userBUsername: '',
-      currentUsersTurn: '',
-    },
+    winner: '',
+    session: emptySession,
   },
   mutations: {
+    CLEAR_STATE(currentState) {
+      currentState.userName = '';
+      currentState.connected = false;
+      currentState.winner = '';
+      currentState.session = emptySession;
+    },
     SET_SESSION(currentState, payload) {
       currentState.session = payload;
     },
@@ -46,6 +55,9 @@ export default new Vuex.Store({
     SET_CONNECTED(currentState, payload) {
       currentState.connected = payload;
     },
+    SET_WINNER(currentState, payload) {
+      currentState.winner = payload.winner;
+    },
   },
   actions: {
     initSession(context, payload) {
@@ -59,6 +71,12 @@ export default new Vuex.Store({
     },
     disconnect(context) {
       context.commit('SET_CONNECTED', false);
+    },
+    setWinner(context, payload) {
+      context.commit('SET_WINNER', payload);
+    },
+    clearState(context) {
+      context.commit('CLEAR_STATE');
     },
   },
   getters: {
@@ -100,6 +118,12 @@ export default new Vuex.Store({
     },
     connected(currentState) {
       return currentState.connected;
+    },
+    finished(currentState) {
+      return currentState.winner && currentState.winner !== '';
+    },
+    winner(currentState) {
+      return currentState.winner === currentState.session.userId;
     },
   },
 });

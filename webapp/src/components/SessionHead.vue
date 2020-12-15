@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <div class="wrapper">
-      <button class="resign">
+      <button class="surrender" @click="surrender">
         <FlagOutlineIcon />
         <ArrowRightIcon />
         <EmoticonDeadOutlineIcon />
@@ -24,6 +24,7 @@
 import FlagOutlineIcon from 'vue-material-design-icons/FlagOutline.vue';
 import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue';
 import EmoticonDeadOutlineIcon from 'vue-material-design-icons/EmoticonDeadOutline.vue';
+import ws from '../api/ws';
 
 export default {
   components: {
@@ -53,11 +54,16 @@ export default {
       return '0';
     },
   },
+  methods: {
+    surrender() {
+      ws.sendSurrender(this.$socket);
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-  .resign {
+  .surrender {
     display: flex;
     margin-left: 10px;
     align-items: center;

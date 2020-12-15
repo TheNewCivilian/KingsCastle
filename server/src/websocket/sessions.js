@@ -88,13 +88,14 @@ const surrender = (connection) => {
     };
   }
   archive.push(currentSession);
+  const winner = connection.userId === currentSession.userA ? currentSession.userB : currentSession.userA;
   delete sessions[connection.sessionId];
   return {
     type: 'SESSION_END',
     sessionId: connection.sessionId,
     message: {
-      userId: connection.userId,
-      action: 'SURRENDER',
+      action: 'SESSION_END',
+      winner,
     },
   };
 };
@@ -147,6 +148,22 @@ const turn = (data, connection) => {
   if (connection.userId === currentSession.userB) {
     currentSession.pointsLeft -= 1;
     // TODO END GAME HERE
+    if (currentSession.pointsLeft <= 0) {
+      archive.push(currentSession);
+      let winner = connection.pointsA > currentSession.userB ? currentSession.userA : currentSession.userB;
+      if (connection.pointsA == currentSession.userB) {
+        winner = 'none';
+      }
+      delete sessions[connection.sessionId];
+      return {
+        type: 'SESSION_END',
+        sessionId: connection.sessionId,
+        message: {
+          action: 'SESSION_END',
+          winner,
+        },
+      };
+    }
   }
 
   const resultCircle = findCircles(computedDots, newDot);

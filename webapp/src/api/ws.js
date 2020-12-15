@@ -33,12 +33,16 @@ const sendTurn = (socket, data) => {
 
 const onResponse = (store, router, response) => {
   const data = JSON.parse(response.data);
+  console.log(data);
   if (data.method === 'SESSION_INIT') {
     store.dispatch('initSession', data.payload);
     router.push({ name: 'Session', query: { sid: data.payload.sessionId } });
   }
   if (data.method === 'SESSION_UPDATE') {
     store.dispatch('addTurn', data.payload);
+  }
+  if (data.method === 'SESSION_END') {
+    store.dispatch('setWinner', data.payload);
   }
   if (data.method === 'CONNECT') {
     store.dispatch('connect');
