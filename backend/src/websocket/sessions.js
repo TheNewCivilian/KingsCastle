@@ -102,7 +102,7 @@ const surrender = (connection) => {
 
 const turn = (data, connection) => {
   // Valid input data
-  if (!(data.xPos && data.yPos)) {
+  if (!('xPos' in data && 'yPos' in data)) {
     return {
       type: 'ERROR',
       message: 'WRONG_PARMS_FOR_TURN',

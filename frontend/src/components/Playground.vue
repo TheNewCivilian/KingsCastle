@@ -60,7 +60,7 @@ export default {
     }
 
     window.addEventListener('wheel', (e) => {
-      const translationY = e.deltaY * 5;
+      const translationY = e.deltaY;
       this.offsetY += translationY;
       this.navigateBoard();
       this.calculatePlayerPos();
