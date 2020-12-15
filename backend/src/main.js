@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const SocketActions = require('./websocket');
 
-const socketPort = 3000;
+const socketPort = 3031;
 const websocket = new WebSocket.Server({ port: socketPort });
 
 console.log(`Websocket Server started on ${socketPort}`);
