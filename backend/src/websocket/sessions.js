@@ -31,7 +31,7 @@ const join = (data, connection) => {
         selectedSession.userB = connection.userId;
         selectedSession.userBUsername = connection.username;
       } else {
-        selectedSession.spectators.push(connection.userId)
+        selectedSession.spectators.push({id: connection.userId, username: connection.username })
       }
       connection.sessionId = data.sessionId;
       return {

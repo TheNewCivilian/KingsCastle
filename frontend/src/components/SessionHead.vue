@@ -3,8 +3,7 @@
     <div class="wrapper">
       <button class="surrender" @click="surrender">
         <FlagOutlineIcon />
-        <ArrowRightIcon />
-        <EmoticonDeadOutlineIcon />
+        <span>Surrender</span>
       </button>
     </div>
     <div class="wrapper wrapper--center">
@@ -22,15 +21,11 @@
 
 <script>
 import FlagOutlineIcon from 'vue-material-design-icons/FlagOutline.vue';
-import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue';
-import EmoticonDeadOutlineIcon from 'vue-material-design-icons/EmoticonDeadOutline.vue';
 import ws from '../api/ws';
 
 export default {
   components: {
-    EmoticonDeadOutlineIcon,
     FlagOutlineIcon,
-    ArrowRightIcon,
   },
   computed: {
     userAUsername() {
@@ -51,7 +46,14 @@ export default {
       return this.$store.getters.pointsLeft;
     },
     spectators() {
-      return '0';
+      const { spectators } = this.$store.getters;
+      if (spectators.length === 1) {
+        return `${spectators[0]} is watching the match.`;
+      }
+      if (spectators.length >= 1) {
+        return `${spectators[0]} and ${spectators.length - 1} other are watching the match.`;
+      }
+      return '';
     },
   },
   methods: {
@@ -70,17 +72,31 @@ export default {
     justify-content: center;
     background-color: white;
     border: none;
-    border-radius: 10px;
-    border: 2px solid rgb(201, 201, 201);
+    border-radius: 30px;
+    max-height: 50px;
+    padding: 15px;
+    border: 1px solid rgb(201, 201, 201);
     box-shadow: 0px 0px 11px -2px rgba(0,0,0,0.2);
   }
-  .page-container{
+  .page-container {
     position: absolute;
     top: 10px;
     left: 0px;
     width: 100%;
     display: flex;
     justify-content: space-between;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .page-container {
+      top: 0px;
+      flex-direction: column;
+      align-items: center;
+    }
+    .surrender {
+      padding: 5px 15px;
+      margin: 5px;
+    }
   }
   .wrapper {
     flex: 1 1 0px;
@@ -94,6 +110,7 @@ export default {
   .container {
     font-size: 20px;
     padding: 15px;
+    max-height: 25px;
     background-color: white;
     border-radius: 30px;
     box-shadow: 0px 0px 11px -2px rgba(0,0,0,0.2);

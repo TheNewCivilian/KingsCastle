@@ -159,10 +159,10 @@ export default {
   width: 300px;
 }
 
-@media only screen and (max-width: 700) {
+@media only screen and (max-width: 700px) {
   .container {
-    right: auto;
-    margin: 0 auto;
+    position: relative;
+    margin: 10px auto;
   }
 }
 

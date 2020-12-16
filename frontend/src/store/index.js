@@ -125,5 +125,8 @@ export default new Vuex.Store({
     winner(currentState) {
       return currentState.winner === currentState.session.userId;
     },
+    spectators(currentState) {
+      return currentState.session.spectators.map((spectator) => spectator.username);
+    },
   },
 });
