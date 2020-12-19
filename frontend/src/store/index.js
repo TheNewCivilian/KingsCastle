@@ -1,27 +1,26 @@
 /* eslint-disable no-param-reassign */
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { v4 as uuidv4 } from 'uuid';
 
 Vue.use(Vuex);
 
 const emptySession = {
-  userId: '',
   sessionId: '',
   dots: [],
   polygons: [],
   pointsA: 0,
   pointsB: 0,
   pointsLeft: 0,
-  userA: '',
-  userAUsername: '',
-  userB: '',
-  userBUsername: '',
+  userA: null,
+  userB: null,
   currentUsersTurn: '',
 };
 
 export default new Vuex.Store({
   state: {
     userName: '',
+    userId: uuidv4(),
     connected: false,
     winner: '',
     session: emptySession,
@@ -83,11 +82,14 @@ export default new Vuex.Store({
     joined(currentState) {
       return currentState.session.sessionId !== '';
     },
-    userAUsername(currentState) {
-      return currentState.session.userAUsername;
+    userId(currentState) {
+      return currentState.userId;
     },
-    userBUsername(currentState) {
-      return currentState.session.userBUsername;
+    userA(currentState) {
+      return currentState.session.userA;
+    },
+    userB(currentState) {
+      return currentState.session.userB;
     },
     pointsA(currentState) {
       return currentState.session.pointsA;
@@ -100,15 +102,13 @@ export default new Vuex.Store({
     },
     allUsersPresent(currentState) {
       return currentState.session.userA
-        && currentState.session.userA !== ''
-        && currentState.session.userB
-        && currentState.session.userB !== '';
+        && currentState.session.userB;
     },
     sessionId(currentState) {
       return currentState.session.sessionId;
     },
     isPlayersTurn(currentState) {
-      return currentState.session.currentUsersTurn === currentState.session.userId;
+      return currentState.session.currentUsersTurn === currentState.userId;
     },
     dots(currentState) {
       return currentState.session.dots;
@@ -123,10 +123,10 @@ export default new Vuex.Store({
       return currentState.winner && currentState.winner !== '';
     },
     winner(currentState) {
-      return currentState.winner === currentState.session.userId;
+      return currentState.winner.userId === currentState.userId;
     },
     spectators(currentState) {
-      return currentState.session.spectators.map((spectator) => spectator.username);
+      return currentState.session.spectators;
     },
   },
 });

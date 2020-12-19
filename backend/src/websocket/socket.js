@@ -17,25 +17,15 @@ const sendResponse = (connection, websocket, response) => {
         }
       });
       break;
+    case 'USER_RECONNECT':
+      sendMessageObject(connection, response.type, response.message);
+      break;
     default:
       sendMessageObject(connection, response.type, response.message);
   }
 }
 
-const randomString = (length = 5) => {
-  // Declare all characters
-  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  // Pick characers randomly
-  let str = '';
-  for (let i = 0; i < length; i++) {
-      str += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return str;
-};
-
 module.exports = {
   sendMessageObject,
   sendResponse,
-  randomString,
 };

@@ -93,6 +93,7 @@ export default {
     if (this.$route.params && this.$route.params.sessionId) {
       this.sessionId = this.$route.params.sessionId;
     }
+    this.$store.dispatch('setWinner', null);
   },
   methods: {
     generateUsername() {
@@ -104,6 +105,7 @@ export default {
       if (this.connected) {
         // TODO VALIDATE USERNAME
         WS.sendJoin(this.$socket, {
+          userId: this.$store.getters.userId,
           sessionId: this.sessionId,
           username: this.username,
         });
@@ -112,6 +114,7 @@ export default {
     host() {
       if (this.connected) {
         WS.sendJoin(this.$socket, {
+          userId: this.$store.getters.userId,
           username: this.username,
           private: this.privateSession,
           dotCount: this.rounds,

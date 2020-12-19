@@ -1,3 +1,18 @@
+const getUnixTime = () => {
+  return Math.ceil(Date.now() / 1000);
+}
+
+const randomString = (length = 5) => {
+  // Declare all characters
+  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  // Pick characers randomly
+  let str = '';
+  for (let i = 0; i < length; i++) {
+      str += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return str;
+};
 
 const listToHashmap = (dotList) => {
   const hashMap = {};
@@ -160,6 +175,7 @@ const findCircles = (computedDots, start) => {
   const dotsInvolved = listToHashmap(discoveredDots);
   // 3. get starting position
   const firstXSegment = Object.keys(dotsInvolved)[0];
+  console.log(dotsInvolved);
   const firstYSegment = Object.keys(dotsInvolved[firstXSegment]).sort((a, b) => parseInt(a) - parseInt(b))[0];
 
   // 4. run one circle on border
@@ -242,4 +258,6 @@ const invalidateCircled = (computedDots, resultCircle) => {
 module.exports = {
   findCircles,
   invalidateCircled,
+  getUnixTime,
+  randomString
 };

@@ -4,7 +4,7 @@ const session = require('./sessions');
 const {
   sendMessageObject,
   sendResponse,
-} = require('./methods');
+} = require('./socket');
 
 const parseMessage = (message) => {
   let data;
@@ -25,6 +25,8 @@ const parseMessage = (message) => {
 };
 
 const onConnect = (connection) => {
+  console.log(connection.user);
+  console.log(connection.sessionId);
   sendMessageObject(connection, 'CONNECT', { error: false });
 };
 
@@ -32,10 +34,7 @@ const onMessage = (websocket, connection, message) => {
   const receivedData = parseMessage(message);
 
   if (receivedData.error) {
-    sendResponse(connection, websocket, {
-      type: 'error',
-      message: Errors.dataFormatError
-    });
+    sendResponse(connection, websocket, Errors.WRONG_DATA_FORMAT);
     return;
   }
 

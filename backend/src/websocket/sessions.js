@@ -1,12 +1,12 @@
-const uuid = require('uuid');
-const {
-  randomString,
-} = require('./methods');
-
+const Errors = require('./errors');
 const {
   findCircles,
   invalidateCircled,
+  getUnixTime,
+  randomString,
 } = require('./helpers');
+const User = require('./user');
+const Session = require('./session');
 
 sessions = {};
 archive = [];
@@ -14,88 +14,122 @@ archive = [];
 const join = (data, connection) => {
   // validate Input data
   console.log(data);
-  if (!(data.username && (data.sessionId  || data.dotCount ))) {
+  if (!(data.username && data.userId
+      && ('sessionId' in data || 'dotCount' in data && 'private' in data ))
+  ) {
+    return Errors.WRONG_PARMS_FOR_JOIN;
+  }
+
+  connection.user = new User(data.username, data.userId, getUnixTime());
+
+  // Check is user is known. Resend session data.
+  // const presentSession = sessions.find(
+  //   (session) => session.userA.userId === data.user.userId
+  //     || session.userB.userId === data.user.userId,
+  // );
+  // if (presentSession) {
+  //   return {
+  //     type: 'USER_RECONNECT',
+  //     sessionId: presentSession.sessionId,
+  //     message: presentSession,
+  //   };
+  // }
+
+  // Opening new Session
+  if ('dotCount' in data && 'private' in data) {
+    console.log(Object.keys(sessions).length);
+    if (Object.keys(sessions).length > 100) {
+      return Errors.MAXIMUM_SESSIONS_REACHED;
+    }
+  
+    let sessionId = randomString();
+    while(sessions[sessionId]) {
+      sessionId = randomString();
+    }
+    sessions[sessionId] = new Session(
+      sessionId,
+      data.dotCount,
+      connection.user,
+    );
+    connection.sessionId = sessionId;
     return {
-      type: 'error',
-      message: 'WRONG_PARMS_FOR_JOIN',
+      type: 'SESSION_INIT',
+      sessionId: sessionId,
+      message: sessions[sessionId],
     };
   }
 
-  connection.username = data.username;
-  connection.userId = uuid.v4();
   // Join existing Session
   if (data.sessionId) {
     const selectedSession = sessions[data.sessionId];
-    if (selectedSession) {
-      if (selectedSession.userB == '') {
-        selectedSession.userB = connection.userId;
-        selectedSession.userBUsername = connection.username;
-      } else {
-        selectedSession.spectators.push({id: connection.userId, username: connection.username })
-      }
-      connection.sessionId = data.sessionId;
-      return {
-        type: 'SESSION_INIT',
-        sessionId: data.sessionId,
-        message: selectedSession,
-      };
+    if (!selectedSession) {
+      return Errors.SESSION_NOT_FOUND;
     }
+    if (!selectedSession.userB) {
+      selectedSession.userB = connection.user;
+    } else {
+      selectedSession.spectators.push(connection.user)
+    }
+    connection.sessionId = data.sessionId;
     return {
-      type: 'ERROR',
-      message: 'SESSION_NOT_FOUND',
+      type: 'SESSION_INIT',
+      sessionId: data.sessionId,
+      message: selectedSession,
     };
   }
-  // Opening new Session
-  console.log(Object.keys(sessions).length);
-  if (Object.keys(sessions).length > 100) {
+
+  // Join a randome session
+  unocupiedSessionKey = Object.keys(sessions).find((sessionKey) => sessions[sessionKey].userB === null);
+
+  if (unocupiedSessionKey) {
+    const unocupiedSession = sessions[unocupiedSessionKey]
+    unocupiedSession.userB = connection.user;
+    connection.sessionId = unocupiedSession.sessionId;
     return {
-      type: 'ERROR',
-      message: 'MAXIMUM_SESSIONS_REACHED',
+      type: 'SESSION_INIT',
+      sessionId: unocupiedSession.sessionId,
+      message: unocupiedSession,
     };
   }
-  newSessionId = randomString();
-  while(sessions[newSessionId]) {
-    newSessionId = randomString();
-  }
-  sessions[newSessionId] = {
-    sessionId: newSessionId,
-    dots: [],
-    polygons: [],
-    pointsA: 0,
-    pointsB: 0,
-    pointsLeft: data.dotCount,
-    userA: connection.userId,
-    userAUsername: connection.username,
-    userB: '',
-    userBUsername: '',
-    spectators: [],
-    currentUsersTurn: connection.userId,
-  };
-  connection.sessionId = newSessionId;
-  return {
-    type: 'SESSION_INIT',
-    sessionId: newSessionId,
-    message: sessions[newSessionId],
-  };
+  return Errors.SESSION_NOT_FOUND;
 };
+
+const endGame = (currentSession, winner) => {
+  archive.push(currentSession);
+  delete sessions[currentSession.sessionId];
+  return {
+    type: 'SESSION_END',
+    sessionId: currentSession.sessionId,
+    message: {
+      action: 'SESSION_END',
+      winner,
+    },
+  };
+}
 
 const surrender = (connection) => {
   const currentSession = sessions[connection.sessionId];
   if (!currentSession) {
-    return {
-      type: 'ERROR',
-      message: 'SESSION_NOT_FOUND',
-    };
+    return Errors.SESSION_NOT_FOUND;
   }
-  archive.push(currentSession);
-  const winner = connection.userId === currentSession.userA ? currentSession.userB : currentSession.userA;
-  delete sessions[connection.sessionId];
+
+  // If user is player -> game over
+  if (
+    connection.user.userId === currentSession.userA.userId
+    || connection.user.userId === currentSession.userB.userId
+  ) {
+    const winner = connection.user.userId === currentSession.userA.userId ? currentSession.userB : currentSession.userA;
+    return endGame(currentSession, winner);
+  }
+
+  // If user is just a spectator
+  currentSession.spectators.filter((spectator) => spectator.userId !== connection.user.userId);
   return {
-    type: 'SESSION_END',
-    sessionId: connection.sessionId,
+    type: 'SESSION_UPDATE',
+    sessionId: currentSession.sessionId,
     message: {
-      action: 'SESSION_END',
-      winner,
+      action: 'SPECTATOR_LEAVE',
+      spectators: currentSession.spectators,
     },
   };
 };
@@ -103,76 +137,56 @@ const surrender = (connection) => {
 const turn = (data, connection) => {
   // Valid input data
   if (!('xPos' in data && 'yPos' in data)) {
-    return {
-      type: 'ERROR',
-      message: 'WRONG_PARMS_FOR_TURN',
-    };
+    return Errors.WRONG_PARMS_FOR_TURN;
   }
+
   // Find corresponding session
   const currentSession = sessions[connection.sessionId];
   if (!currentSession) {
-    return {
-      type: 'ERROR',
-      message: 'SESSION_NOT_FOUND',
-    };
-  }
-  if (currentSession.currentUsersTurn !== connection.userId) {
-    return {
-      type: 'ERROR',
-      message: 'NOT_USERS_TURN',
-    };
+    return Errors.SESSION_NOT_FOUND;
   }
 
+  // Its not users turn
+  if (currentSession.currentUsersTurn !== connection.user.userId) {
+    return Errors.NOT_USERS_TURN;
+  }
+
+  // Dot might be already present
   const computedDots = currentSession.dots;
-  // ADD DOT
+  if (computedDots[data.xPos] && computedDots[data.xPos][data.yPos]) {
+    return Errors.POINT_ALREADY_PRESENT;
+  }
+
+  // Add Dot
   const newDot = {
     x: data.xPos,
     y: data.yPos,
-    party: connection.userId === currentSession.userA ? 'userA' : 'userB',
+    party: connection.user.userId === currentSession.userA.userId ? 'userA' : 'userB',
     invalid: false,
   };
   if (!computedDots[data.xPos]) {
     computedDots[data.xPos] = {};
   }
-  if (computedDots[data.xPos][data.yPos]) {
-    return {
-      type: 'ERROR',
-      message: {
-        error: true,
-        message: 'Point already present',
-      }
-    }
-  }
   computedDots[data.xPos][data.yPos] = newDot;
 
-  if (connection.userId === currentSession.userB) {
+  // Decrease Points left
+  if (connection.user.userId === currentSession.userB.userId) {
     currentSession.pointsLeft -= 1;
-    // TODO END GAME HERE
     if (currentSession.pointsLeft <= 0) {
-      archive.push(currentSession);
-      let winner = currentSession.pointsA > currentSession.userB ? currentSession.userA : currentSession.userB;
-      if (connection.pointsA == currentSession.userB) {
+      let winner = currentSession.pointsA > currentSession.pointsB ? currentSession.userA : currentSession.userB;
+      if (currentSession.pointsA == currentSession.pointsB) {
         winner = 'none';
       }
-      delete sessions[connection.sessionId];
-      return {
-        type: 'SESSION_END',
-        sessionId: connection.sessionId,
-        message: {
-          action: 'SESSION_END',
-          winner,
-        },
-      };
+      return endGame(currentSession, winner);
     }
   }
 
+  // Retrieve circles
   const resultCircle = findCircles(computedDots, newDot);
-
   let newPolygon;
-
   if (resultCircle && resultCircle.length > 3) {
     const pointsMade = invalidateCircled(computedDots, resultCircle);
-    if (connection.userId === currentSession.userA) {
+    if (connection.user.userId === currentSession.userA) {
       currentSession.pointsA += pointsMade;
     } else {
       currentSession.pointsB += pointsMade;
@@ -183,16 +197,16 @@ const turn = (data, connection) => {
       vertices: vertices,
       x: resultCircle.path[0].x,
       y: resultCircle.path[0].y,
-      party: connection.userId === currentSession.userA ? 'userA' : 'userB',
+      party: connection.user.userId === currentSession.userA.userId ? 'userA' : 'userB',
     };
     currentSession.polygons.push(newPolygon);
   }
 
   // Let next player play its turn.
-  if (connection.userId === currentSession.userA) {
-    currentSession.currentUsersTurn = currentSession.userB;
+  if (connection.user.userId === currentSession.userA.userId) {
+    currentSession.currentUsersTurn = currentSession.userB.userId;
   } else {
-    currentSession.currentUsersTurn = currentSession.userA;
+    currentSession.currentUsersTurn = currentSession.userA.userId;
   }
   return {
     type: 'SESSION_UPDATE',

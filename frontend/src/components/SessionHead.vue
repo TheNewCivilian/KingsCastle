@@ -29,12 +29,12 @@ export default {
   },
   computed: {
     userAUsername() {
-      const userA = this.$store.getters.userAUsername;
-      return userA && userA !== '' ? userA : 'Waiting...';
+      const { userA } = this.$store.getters;
+      return userA && userA.username ? userA.username : 'Waiting...';
     },
     userBUsername() {
-      const userB = this.$store.getters.userBUsername;
-      return userB && userB !== '' ? userB : 'Waiting...';
+      const { userB } = this.$store.getters;
+      return userB && userB.username ? userB.username : 'Waiting...';
     },
     pointsA() {
       return this.$store.getters.pointsA;
@@ -48,10 +48,10 @@ export default {
     spectators() {
       const { spectators } = this.$store.getters;
       if (spectators.length === 1) {
-        return `${spectators[0]} is watching the match.`;
+        return `${spectators[0].username} is watching the match.`;
       }
       if (spectators.length >= 1) {
-        return `${spectators[0]} and ${spectators.length - 1} other are watching the match.`;
+        return `${spectators[0].username} and ${spectators.length - 1} other are watching the match.`;
       }
       return '';
     },
