@@ -93,7 +93,7 @@ export default {
     if (this.$route.params && this.$route.params.sessionId) {
       this.sessionId = this.$route.params.sessionId;
     }
-    this.$store.dispatch('setWinner', null);
+    this.$store.dispatch('setWinner', '');
   },
   methods: {
     generateUsername() {

@@ -173,9 +173,12 @@ const findCircles = (computedDots, start) => {
   // 2. discover all connected dots
   const discoveredDots = discoverInvolved(computedDots, start, start);
   const dotsInvolved = listToHashmap(discoveredDots);
+
+  if (Object.keys(dotsInvolved).length <= 0) {
+    return null;
+  }
   // 3. get starting position
   const firstXSegment = Object.keys(dotsInvolved)[0];
-  console.log(dotsInvolved);
   const firstYSegment = Object.keys(dotsInvolved[firstXSegment]).sort((a, b) => parseInt(a) - parseInt(b))[0];
 
   // 4. run one circle on border
