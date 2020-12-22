@@ -5,7 +5,7 @@ class Session {
     userA,
   ) {
     this.sessionId = sessionId;
-    this.dots = [];
+    this.dots = {};
     this.polygons = [];
     this.pointsA = 0;
     this.pointsB = 0;

@@ -4,12 +4,13 @@ const {
   invalidateCircled,
   getUnixTime,
   randomString,
+  hashMapToList,
 } = require('./helpers');
 const User = require('./user');
 const Session = require('./session');
 
-sessions = {};
-archive = [];
+const sessions = {};
+const archive = [];
 
 const join = (data, connection) => {
   // validate Input data
@@ -55,7 +56,7 @@ const join = (data, connection) => {
     return {
       type: 'SESSION_INIT',
       sessionId: sessionId,
-      message: sessions[sessionId],
+      message: { ...sessions[sessionId], dots: []},
     };
   }
 
@@ -74,7 +75,7 @@ const join = (data, connection) => {
     return {
       type: 'SESSION_INIT',
       sessionId: data.sessionId,
-      message: selectedSession,
+      message: { ...selectedSession, dots: []},
     };
   }
 
@@ -88,7 +89,7 @@ const join = (data, connection) => {
     return {
       type: 'SESSION_INIT',
       sessionId: unocupiedSession.sessionId,
-      message: unocupiedSession,
+      message: { ...unocupiedSession, dots: []},
     };
   }
   return Errors.SESSION_NOT_FOUND;
@@ -203,11 +204,11 @@ const turn = (data, connection) => {
   }
 
   // Let next player play its turn.
-  if (connection.user.userId === currentSession.userA.userId) {
-    currentSession.currentUsersTurn = currentSession.userB.userId;
-  } else {
-    currentSession.currentUsersTurn = currentSession.userA.userId;
-  }
+  // if (connection.user.userId === currentSession.userA.userId) {
+  //   currentSession.currentUsersTurn = currentSession.userB.userId;
+  // } else {
+  //   currentSession.currentUsersTurn = currentSession.userA.userId;
+  // }
   return {
     type: 'SESSION_UPDATE',
     sessionId: connection.sessionId,
