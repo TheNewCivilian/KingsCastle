@@ -41,6 +41,7 @@
     <div class="section">
       <span class="subtitle">Join Game</span>
       <span class="description">Join a randome game with no code.</span>
+      <span>{{joinError}}</span>
       <input
         id="username_session"
         type="text"

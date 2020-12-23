@@ -118,9 +118,6 @@ const discoverDotCloud = (computedDots, start, end, dotsInvolved = {}) => {
       if (xDir === 0 && yDir === 0) continue;
       const nextXPos = start.x + xDir;
       const nextYPos = start.y + yDir;
-
-      console.log(nextXPos);
-      console.log(nextYPos);
       if (
         computedDots[nextXPos]
         && computedDots[nextXPos][nextYPos]
@@ -137,23 +134,21 @@ const discoverDotCloud = (computedDots, start, end, dotsInvolved = {}) => {
       }
     }
   }
-  console.log('neig', neighborCount);
-  if (neighborCount < 2) {
-    return [];
-  }
+  // if (neighborCount < 2) {
+  //   return [];
+  // }
   return [{...start, neighborCount } , ...discoveredDots];
 }
 
 const reduceDotCloud = (dotCloud) => {
   let removedDots = [];
   const reducedDotCloud = dotCloud.map((dot) => {
-    if (dot.neighborCount != 1) {
+    if (dot.neighborCount !== 1) {
       return dot;
     }
     removedDots.push(dot);
     return;
-  });
-
+  }).filter((element) => element !== undefined);
   let update = false;
   // update neighborCount
   reducedDotCloud.forEach((cloudElement) => {
@@ -177,9 +172,7 @@ const reduceDotCloud = (dotCloud) => {
 }
 
 const discoverInvolved3 = (computedDots, start) => {
-  console.log(computedDots);
   const dotCloud = discoverDotCloud(computedDots, start, start);
-  console.log(dotCloud);
   return reduceDotCloud(dotCloud);
 }
 
@@ -257,7 +250,6 @@ const findCircles = (computedDots, start) => {
 
   // 2. discover all connected dots
   const discoveredDots = discoverInvolved3(computedDots, start);
-  console.log(discoveredDots);
   const dotsInvolved = listToHashmap(discoveredDots);
 
   if (Object.keys(dotsInvolved).length <= 0) {

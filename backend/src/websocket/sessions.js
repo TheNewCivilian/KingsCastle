@@ -51,6 +51,7 @@ const join = (data, connection) => {
       sessionId,
       data.dotCount,
       connection.user,
+      data.private,
     );
     connection.sessionId = sessionId;
     return {
@@ -63,24 +64,26 @@ const join = (data, connection) => {
   // Join existing Session
   if (data.sessionId) {
     const selectedSession = sessions[data.sessionId];
-    if (!selectedSession) {
-      return Errors.SESSION_NOT_FOUND;
+    if (selectedSession) {
+      if (!selectedSession.userB) {
+        selectedSession.userB = connection.user;
+      } else {
+        selectedSession.spectators.push(connection.user)
+      }
+      connection.sessionId = data.sessionId;
+      return {
+        type: 'SESSION_INIT',
+        sessionId: data.sessionId,
+        message: { ...selectedSession, dots: []},
+      };
     }
-    if (!selectedSession.userB) {
-      selectedSession.userB = connection.user;
-    } else {
-      selectedSession.spectators.push(connection.user)
-    }
-    connection.sessionId = data.sessionId;
-    return {
-      type: 'SESSION_INIT',
-      sessionId: data.sessionId,
-      message: { ...selectedSession, dots: []},
-    };
   }
 
-  // Join a randome session
-  unocupiedSessionKey = Object.keys(sessions).find((sessionKey) => sessions[sessionKey].userB === null);
+  // Join a random session
+  const unocupiedSessionKey = Object.keys(sessions).find(
+    (sessionKey) => sessions[sessionKey].userB === null
+      && session[sessionKey].private,
+  );
 
   if (unocupiedSessionKey) {
     const unocupiedSession = sessions[unocupiedSessionKey]
@@ -204,11 +207,11 @@ const turn = (data, connection) => {
   }
 
   // Let next player play its turn.
-  // if (connection.user.userId === currentSession.userA.userId) {
-  //   currentSession.currentUsersTurn = currentSession.userB.userId;
-  // } else {
-  //   currentSession.currentUsersTurn = currentSession.userA.userId;
-  // }
+  if (connection.user.userId === currentSession.userA.userId) {
+    currentSession.currentUsersTurn = currentSession.userB.userId;
+  } else {
+    currentSession.currentUsersTurn = currentSession.userA.userId;
+  }
   return {
     type: 'SESSION_UPDATE',
     sessionId: connection.sessionId,

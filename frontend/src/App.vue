@@ -49,6 +49,7 @@ input {
 input[type=text] {
   border: 2px solid gainsboro;
   border-radius: 10px;
+  color: #000;
 }
 
 input[type=range] {

@@ -3,6 +3,7 @@ class Session {
     sessionId,
     pointsLeft,
     userA,
+    privateSession,
   ) {
     this.sessionId = sessionId;
     this.dots = {};
@@ -12,6 +13,7 @@ class Session {
     this.pointsLeft = pointsLeft;
     this.userA = userA;
     this.userB = null;
+    this.private = privateSession;
     this.spectators = [];
     this.currentUsersTurn = userA.userId;
   }

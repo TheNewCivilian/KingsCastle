@@ -19,6 +19,7 @@ const emptySession = {
 
 export default new Vuex.Store({
   state: {
+    error: '',
     userName: '',
     userId: uuidv4(),
     connected: false,
@@ -26,6 +27,9 @@ export default new Vuex.Store({
     session: emptySession,
   },
   mutations: {
+    SET_ERROR(currentState, payload) {
+      currentState.error = payload;
+    },
     CLEAR_STATE(currentState) {
       currentState.userName = '';
       currentState.connected = false;
@@ -59,6 +63,9 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    setError(context, payload) {
+      context.commit('SET_ERROR', payload);
+    },
     initSession(context, payload) {
       context.commit('SET_SESSION', payload);
     },
@@ -79,6 +86,9 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    error(currentState) {
+      return currentState.error;
+    },
     joined(currentState) {
       return currentState.session.sessionId !== '';
     },

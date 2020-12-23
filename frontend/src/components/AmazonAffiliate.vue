@@ -5,8 +5,8 @@
         <span class="spacer">Support</span><HeartOutlineIcon />
       </div>
       <div class="description">
-      <span class="description__heighlight">Still missing a christmas present?</span>
-      Support the independence of KingsCastle.io by checking for presents on
+      <!-- <span class="description__heighlight">Still missing a christmas present?</span> -->
+      Support the independence of KingsCastle.io by searching for amazing things on
       </div>
       <a class="affiliate" href="https://amazon.com"><AmazonIcon /><span class="spacer">Amazon</span></a>
       <span

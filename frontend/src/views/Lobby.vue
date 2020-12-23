@@ -6,16 +6,16 @@
       </video> -->
     </div>
     <main-menu />
-    <!-- <amazon-affiliate /> -->
+    <amazon-affiliate />
   </div>
 </template>
 
 <script>
-// import AmazonAffiliate from '../components/AmazonAffiliate.vue';
+import AmazonAffiliate from '../components/AmazonAffiliate.vue';
 import MainMenu from '../components/MainMenu.vue';
 
 export default {
-  components: { MainMenu },
+  components: { MainMenu, AmazonAffiliate },
   name: 'Home',
 };
 </script>
