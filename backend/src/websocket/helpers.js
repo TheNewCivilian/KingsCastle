@@ -35,6 +35,7 @@ const listToHashmap = (dotList) => {
   return hashMap;
 }
 
+// TODO fix in negative
 const circleSearch = (computedDots, start, end, heritage) => {
   const idPositions = {
     0: {x: -1, y: -1},
@@ -134,9 +135,6 @@ const discoverDotCloud = (computedDots, start, end, dotsInvolved = {}) => {
       }
     }
   }
-  // if (neighborCount < 2) {
-  //   return [];
-  // }
   return [{...start, neighborCount } , ...discoveredDots];
 }
 
@@ -176,56 +174,6 @@ const discoverInvolved3 = (computedDots, start) => {
   return reduceDotCloud(dotCloud);
 }
 
-// const discoverInvolved = (computedDots, start, end, dotsInvolved = {}) => {
-//   if (!dotsInvolved[start.x]) {
-//     dotsInvolved[start.x] = {};
-//   }
-//   dotsInvolved[start.x][start.y] = start;
-
-//   let discoveredDots = [];
-//   let neighborCount = 0;
-
-//   let hasBackloop = false;
-//   for (let xDir = -1; xDir <= 1; xDir += 1) {
-//     for (let yDir = -1; yDir <= 1; yDir += 1) {
-//       if (xDir === 0 && yDir === 0) continue;
-
-//       const nextXPos = start.x + xDir;
-//       const nextYPos = start.y + yDir;
-
-//       if (nextXPos === end.x && nextYPos === end.y) {
-//         hasBackloop = true;
-//       }
-
-//       if (
-//         computedDots[nextXPos]
-//         && computedDots[nextXPos][nextYPos]
-//         && computedDots[nextXPos][nextYPos].party === start.party
-//         && !computedDots[nextXPos][nextYPos].invalid
-//       ) {
-//         neighborCount += 1;
-//         // If not used until now
-//         if (!dotsInvolved[nextXPos] || !dotsInvolved[nextXPos][nextYPos]) {
-//           const furtherSearchResults = discoverInvolved(computedDots, computedDots[nextXPos][nextYPos], end, dotsInvolved);
-//           if (furtherSearchResults.length !== 0) {
-//             discoveredDots = [...discoveredDots, ...furtherSearchResults];
-//           }
-//         }
-//       }
-//     }
-//   }
-//   if (neighborCount < 2) {
-//     return [];
-//   }
-//   if (discoveredDots.length === 0) {
-//     if (hasBackloop === true) {
-//       return [start];
-//     }
-//     return [];
-//   }
-//   return [start, ...discoveredDots];
-// }
-
 const findCircles = (computedDots, start) => {
   // 1. Check if dot has at least 2 neighbors
   let neighborCount = 0;
@@ -256,7 +204,7 @@ const findCircles = (computedDots, start) => {
     return null;
   }
   // 3. get starting position
-  const firstXSegment = Object.keys(dotsInvolved)[0];
+  const firstXSegment = Object.keys(dotsInvolved).sort((a, b) => parseInt(a) - parseInt(b))[0];
   const firstYSegment = Object.keys(dotsInvolved[firstXSegment]).sort((a, b) => parseInt(a) - parseInt(b))[0];
 
   // 4. run one circle on border
@@ -295,7 +243,8 @@ const invalidateCircled = (computedDots, resultCircle) => {
     }
   });
 
-  Object.keys(positionedResultCircle).forEach((xSegment) => {
+  const sortedXSegmentKeys = Object.keys(positionedResultCircle).sort((a, b) => a - b);
+  sortedXSegmentKeys.forEach((xSegment) => {
     const sortedYSegment = positionedResultCircle[xSegment].sort((a, b) => a.y - b.y);
     // Iterating from top to bottom
     sortedYSegment.forEach((point) => {

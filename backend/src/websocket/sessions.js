@@ -8,6 +8,7 @@ const {
 const User = require('./user');
 const Session = require('./session');
 const fs = require('fs');
+const { get } = require('http');
 
 const sessions = {};
 
@@ -71,7 +72,7 @@ const join = (data, connection) => {
     connection.sessionId = sessionId;
     // Check if any old session expired.
     checkSessionsAlive();
-    console.log(`node l[JOIN] User ${data.username} opened Session ${sessionId}`);
+    console.log(`${getUnixTime()} [JOIN] User ${data.username} opened Session ${sessionId}`);
     return {
       type: 'SESSION_INIT',
       sessionId: sessionId,
@@ -89,7 +90,7 @@ const join = (data, connection) => {
         selectedSession.spectators.push(connection.user)
       }
       connection.sessionId = data.sessionId;
-      console.log(`[JOIN] User ${data.username} joined Session ${data.sessionId}`);
+      console.log(`${getUnixTime()} [JOIN] User ${data.username} joined Session ${data.sessionId}`);
       return {
         type: 'SESSION_INIT',
         sessionId: data.sessionId,
@@ -108,7 +109,7 @@ const join = (data, connection) => {
     const unoccupiedSession = sessions[unoccupiedSessionKey]
     unoccupiedSession.userB = connection.user;
     connection.sessionId = unoccupiedSession.sessionId;
-    console.log(`[JOIN] User ${data.username} joined random Session ${unoccupiedSession.sessionId}`);
+    console.log(`${getUnixTime()} [JOIN] User ${data.username} joined random Session ${unoccupiedSession.sessionId}`);
     return {
       type: 'SESSION_INIT',
       sessionId: unoccupiedSession.sessionId,
@@ -119,7 +120,7 @@ const join = (data, connection) => {
 };
 
 const endGame = (currentSession, winner) => {
-  console.log(`[END] Session Session ${currentSession.sessionId} archived`);
+  console.log(`${getUnixTime()} [END] Session Session ${currentSession.sessionId} archived`);
   saveSessionToArchive(currentSession);
   delete sessions[currentSession.sessionId];
   return {

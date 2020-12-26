@@ -18,8 +18,8 @@ const isMobile = () => window.innerWidth <= 1000;
 export default {
   data() {
     return {
-      offsetX: 0,
-      offsetY: 0,
+      offsetX: window.innerWidth / 2,
+      offsetY: window.innerHeight / 2,
       lastMouseX: 0,
       lastMouseY: 0,
       playerDot: null,

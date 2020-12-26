@@ -5,6 +5,7 @@ const {
   sendMessageObject,
   sendResponse,
 } = require('./socket');
+const { getUnixTime } = require('./helpers');
 
 const parseMessage = (message) => {
   let data;
@@ -24,7 +25,7 @@ const parseMessage = (message) => {
 };
 
 const onConnect = (websocket, connection) => {
-  console.log(`[CONNECT] now ${websocket.clients.size} online`);
+  console.log(`${getUnixTime()} [CONNECT] now ${websocket.clients.size} online`);
   sendMessageObject(connection, 'CONNECT', { error: false });
 };
 
@@ -55,7 +56,7 @@ const onMessage = (websocket, connection, message) => {
 };
 
 const onClose = (websocket, connection) => {
-  console.log(`[DISCONNECT] now ${websocket.clients.size} online`);
+  console.log(`${getUnixTime()} [DISCONNECT] now ${websocket.clients.size} online`);
   // console.log("connection Closed");
   // sendResponse(connection, websocket, session.surrender(connection));
 };
