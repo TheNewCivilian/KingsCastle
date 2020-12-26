@@ -7,6 +7,7 @@
       <label for="username_input" class="subtitle">
         Username
       </label>
+      <span class="error-text">{{ usernameError }}</span>
       <input id="username_input" type="text" v-model="username"/>
     </div>
     <div class="section">
@@ -16,7 +17,6 @@
           <span>Points:</span>
           <span>{{rounds}}</span>
         </div>
-        <!-- <input type="range" min="100" max="1000" v-model="rounds"> -->
         <Slider :min="100" :max="1000" v-model="rounds"/>
       </div>
       <div class="row settings-container">
@@ -41,7 +41,7 @@
     <div class="section">
       <span class="subtitle">Join Game</span>
       <span class="description">Join a randome game with no code.</span>
-      <span>{{joinError}}</span>
+      <span class="error-text">{{ joinError }}</span>
       <input
         id="username_session"
         type="text"
@@ -82,6 +82,8 @@ export default {
       privateSession: false,
       username: this.generateUsername(),
       sessionId: '',
+      joinError: '',
+      usernameError: '',
     };
   },
   computed: {
@@ -102,18 +104,26 @@ export default {
       console.log(name);
       return name;
     },
+    usernameValidation() {
+      if (!this.username || this.username === '') {
+        this.usernameError = 'Username cannot be empty';
+        return false;
+      }
+      return true;
+    },
     join() {
-      if (this.connected) {
+      if (this.connected && this.usernameValidation()) {
         // TODO VALIDATE USERNAME
         WS.sendJoin(this.$socket, {
           userId: this.$store.getters.userId,
           sessionId: this.sessionId,
           username: this.username,
         });
+        this.joinError = 'Could not find session';
       }
     },
     host() {
-      if (this.connected) {
+      if (this.connected && this.usernameValidation()) {
         WS.sendJoin(this.$socket, {
           userId: this.$store.getters.userId,
           username: this.username,
@@ -218,5 +228,9 @@ export default {
   &--orange {
     background-color: #FF8C42;
   }
+}
+
+.error-text {
+  color: red;
 }
 </style>

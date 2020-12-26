@@ -3,6 +3,8 @@
     class="playground"
     ref="playground"
     @mousemove="mouseMove"
+    @touchstart="(e) => startTouch = e.touches[0]"
+    @touchend="checkTouchEvent"
   />
 </template>
 
@@ -20,6 +22,7 @@ export default {
       lastMouseY: 0,
       playerDot: null,
       two: null,
+      startTouch: null,
     };
   },
   computed: {
@@ -78,6 +81,14 @@ export default {
     ws.sendSurrender(this.$socket);
   },
   methods: {
+    checkTouchEvent(e) {
+      if (this.startTouch) {
+        this.offsetX -= e.changedTouches[0].pageX - this.startTouch.pageX;
+        this.offsetY -= e.changedTouches[0].pageY - this.startTouch.pageY;
+        this.navigateBoard();
+        this.startTouch = null;
+      }
+    },
     mouseMove(e) {
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;

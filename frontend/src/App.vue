@@ -38,6 +38,11 @@ button {
   cursor: pointer;
 }
 
+a {
+  text-decoration: none;
+  font-size: inherit;
+}
+
 input {
   font-family: 'Balsamiq Sans', cursive;
   padding: 12px 20px;

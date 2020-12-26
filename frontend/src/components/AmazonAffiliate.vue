@@ -9,12 +9,15 @@
       Support the independence of KingsCastle.io by searching for amazing things on
       </div>
       <a class="affiliate" href="https://amazon.com"><AmazonIcon /><span class="spacer">Amazon</span></a>
-      <span
-        class="imprint"
-        @click="imprintShown = true"
-      >
-        Imprint - About
-      </span>
+      <div class="footer-container">
+        <span
+          class="imprint"
+          @click="imprintShown = true"
+        >
+          Imprint - About -
+        </span>
+        <router-link to='privacy' class="imprint"> Privacy Policy </router-link>
+      </div>
     </div>
     <Imprint
       :closeCallback="() => imprintShown = false"
@@ -71,6 +74,17 @@ export default {
   pointer-events: all;
 }
 
+@media only screen and (max-width: 700px) {
+  .page-container {
+    position: relative;
+    margin: 10px auto;
+  }
+  .container {
+    position: relative;
+    margin: 10px auto;
+  }
+}
+
 .subtitle {
   display: flex;
   align-items: center;
@@ -107,9 +121,12 @@ export default {
   text-decoration: none;
 }
 
+.footer-container {
+  margin-top: 5px;
+}
+
 .imprint {
   font-size: 14px;
-  margin-top: 5px;
   color: gray;
   cursor: pointer;
 }

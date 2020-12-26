@@ -23,7 +23,7 @@ export default {
 <style lang="scss" scoped>
 
 .video-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
