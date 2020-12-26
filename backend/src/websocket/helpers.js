@@ -174,6 +174,47 @@ const discoverInvolved3 = (computedDots, start) => {
   return reduceDotCloud(dotCloud);
 }
 
+const eliminateDoublePaths = (start, circle) => {
+  const outPath = [];
+  const tmpList = {};
+  const duplicatePoints = circle.path.filter((dot) => {
+    if (tmpList[dot.x] && tmpList[dot.x][dot.y]) {
+      return true;
+    }
+    if (!tmpList[dot.x]) {
+      tmpList[dot.x] = {};
+    }
+    tmpList[dot.x][dot.y] = dot;
+    return false;
+  });
+  const startIndex = circle.path.findIndex((dot) => dot.x === start.x && dot.y === start.y);
+  if (startIndex === -1) {
+    return circle;
+  }
+  if (duplicatePoints.some((dot) => dot.x === start.x && dot.y === start.y)) {
+    return { length: 0, path: [] }
+  }
+  outPath.push(circle.path[startIndex]);
+  for(
+    let lastPointIndex = ((startIndex + 1) % circle.path.length);
+    lastPointIndex !== startIndex || outPath.length === 0;
+    lastPointIndex = ((lastPointIndex + 1) % circle.path.length)
+  ) {
+    if (duplicatePoints.some((dub) => dub.x === circle.path[lastPointIndex].x && dub.y === circle.path[lastPointIndex].y)) {
+      const duplicate = circle.path[lastPointIndex];
+      let returningIndex = ((lastPointIndex + 1) % circle.path.length);
+      while(!(circle.path[returningIndex].x === duplicate.x && circle.path[returningIndex].y === duplicate.y)) {
+        returningIndex = ((returningIndex + 1) % circle.path.length);
+      }
+      lastPointIndex = returningIndex;
+      outPath.push({ ...circle.path[lastPointIndex], in: duplicate.in });
+      continue;
+    }
+    outPath.push(circle.path[lastPointIndex]);
+  }
+  return { length: outPath.length, path: outPath };
+}
+
 const findCircles = (computedDots, start) => {
   // 1. Check if dot has at least 2 neighbors
   let neighborCount = 0;
@@ -210,6 +251,11 @@ const findCircles = (computedDots, start) => {
   // 4. run one circle on border
   const startPoint = dotsInvolved[firstXSegment][firstYSegment];
   const circleWithTwowayLines = circleSearch(dotsInvolved, startPoint, startPoint, {x: startPoint.x - 1, y: startPoint.y - 1});
+  if (circleWithTwowayLines && circleWithTwowayLines.length > 3) {
+    return eliminateDoublePaths(start, circleWithTwowayLines);
+  }
+  // console.log(circleWithTwowayLines);
+  // console.log('result', );
   return circleWithTwowayLines;
 }
 

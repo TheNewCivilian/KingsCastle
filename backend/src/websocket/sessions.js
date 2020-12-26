@@ -222,7 +222,7 @@ const turn = (data, connection) => {
   let newPolygon;
   if (resultCircle && resultCircle.length > 3) {
     const pointsMade = invalidateCircled(computedDots, resultCircle);
-    if (connection.user.userId === currentSession.userA) {
+    if (connection.user.userId === currentSession.userA.userId) {
       currentSession.pointsA += pointsMade;
     } else {
       currentSession.pointsB += pointsMade;
