@@ -32,6 +32,7 @@ body, html, #app {
   text-align: center;
   color: #2c3e50;
   font-family: 'Balsamiq Sans', cursive;
+  overflow: auto;
 }
 
 button {

@@ -16,6 +16,7 @@ const emptySession = {
   userA: null,
   userB: null,
   currentUsersTurn: '',
+  spectators: [],
 };
 
 export default new Vuex.Store({
@@ -138,7 +139,7 @@ export default new Vuex.Store({
       return currentState.winner && currentState.winner !== '';
     },
     winner(currentState) {
-      return currentState.winner.userId === currentState.userId;
+      return currentState.winner && currentState.winner !== '' && currentState.winner.userId === currentState.userId;
     },
     spectators(currentState) {
       return currentState.session.spectators;

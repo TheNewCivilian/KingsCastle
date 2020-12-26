@@ -82,4 +82,16 @@ export default {
   box-shadow: 0px 0px 11px -2px rgba(0,0,0,0.2);
   margin: 10px;
 }
+@media screen and (max-width: 500px) {
+  .title {
+    font-size: 30px;
+  }
+  .copy-button {
+    font-size: 16px;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+}
 </style>

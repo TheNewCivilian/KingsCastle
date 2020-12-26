@@ -21,6 +21,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.home {
+  height: fit-content;
+}
 
 .video-container {
   position: fixed;

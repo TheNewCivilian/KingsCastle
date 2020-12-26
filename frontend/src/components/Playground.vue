@@ -4,6 +4,7 @@
     ref="playground"
     @mousemove="mouseMove"
     @touchstart="(e) => startTouch = e.touches[0]"
+    @touchmove="checkTouchMove"
     @touchend="checkTouchEvent"
   />
 </template>
@@ -79,14 +80,19 @@ export default {
     this.$refs.playground.addEventListener('mousedown', () => this.placePoint());
   },
   beforeDestroy() {
-    console.log('unmount');
     ws.sendSurrender(this.$socket);
   },
   methods: {
+    checkTouchMove(e) {
+      this.offsetX += e.changedTouches[0].pageX - this.startTouch.pageX;
+      this.offsetY += e.changedTouches[0].pageY - this.startTouch.pageY;
+      this.navigateBoard();
+      [this.startTouch] = e.touches;
+    },
     checkTouchEvent(e) {
       if (this.startTouch) {
-        this.offsetX -= e.changedTouches[0].pageX - this.startTouch.pageX;
-        this.offsetY -= e.changedTouches[0].pageY - this.startTouch.pageY;
+        this.offsetX += e.changedTouches[0].pageX - this.startTouch.pageX;
+        this.offsetY += e.changedTouches[0].pageY - this.startTouch.pageY;
         this.navigateBoard();
         this.startTouch = null;
       }
@@ -182,8 +188,8 @@ export default {
         default:
           console.log(e);
       }
-      this.offsetX -= translationX;
-      this.offsetY -= translationY;
+      this.offsetX += translationX;
+      this.offsetY += translationY;
       this.navigateBoard();
       this.calculatePlayerPos();
     },

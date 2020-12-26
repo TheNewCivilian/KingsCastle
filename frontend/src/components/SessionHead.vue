@@ -106,16 +106,23 @@ export default {
       top: 0px;
       flex-direction: column;
       align-items: center;
+      min-height: 155px;
     }
     .surrender {
       padding: 5px 15px;
       margin: 5px;
     }
+    .wrapper {
+      min-height: 50px;
+    }
+    .wrapper--center {
+      min-height: 75px;
+    }
   }
   .wrapper {
     flex: 1 1 0px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
 
@@ -123,6 +130,12 @@ export default {
       justify-content: center;
     }
   }
+
+  // @supports (-webkit-touch-callout: none) {
+  //   .page-container {
+  //     height: 150px;
+  //   }
+  // }
 
   .notification {
     background-color: #48A9A6;
@@ -166,6 +179,20 @@ export default {
     border-right: 1px solid gainsboro;
   }
 
+  @media screen and (max-width: 500px) {
+    .container {
+      font-size: 16px;
+    }
+    .points {
+      margin: 0 5px;
+    }
+    .pointsLeft {
+      padding: 0 5px;
+    }
+    .username {
+      margin: 0 5px;
+    }
+  }
   .spectators {
     flex: 1 1 0px;
     text-align: right;
