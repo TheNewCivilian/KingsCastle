@@ -100,6 +100,9 @@ export default new Vuex.Store({
     userA(currentState) {
       return currentState.session.userA;
     },
+    isUserA(currentState) {
+      return currentState.session.userA.userId === currentState.userId;
+    },
     userB(currentState) {
       return currentState.session.userB;
     },

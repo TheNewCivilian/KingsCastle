@@ -14,6 +14,14 @@
         <span class="points points--blue">{{pointsB}}</span>
         <span class="username">{{userBUsername}}</span>
       </div>
+      <transition name="slide">
+        <div
+          v-if="isPlayersTurn"
+          :class="isUserA ? 'notification notification--orange' : 'notification'"
+        >
+          Its your turn!
+        </div>
+      </transition>
     </div>
     <span class="spectators">{{spectators}}</span>
   </div>
@@ -54,6 +62,12 @@ export default {
         return `${spectators[0].username} and ${spectators.length - 1} other are watching the match.`;
       }
       return '';
+    },
+    isPlayersTurn() {
+      return this.$store.getters.isPlayersTurn;
+    },
+    isUserA() {
+      return this.$store.getters.isUserA;
     },
   },
   methods: {
@@ -101,12 +115,28 @@ export default {
   .wrapper {
     flex: 1 1 0px;
     display: flex;
-    justify-content: left;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
     &--center {
       justify-content: center;
     }
   }
+
+  .notification {
+    background-color: #48A9A6;
+    color: white;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding: 3px 20px;
+    z-index: 1;
+
+    &--orange {
+      background-color: #FF8C42;
+    }
+  }
+
   .container {
     font-size: 20px;
     padding: 15px;
@@ -114,6 +144,7 @@ export default {
     background-color: white;
     border-radius: 30px;
     box-shadow: 0px 0px 11px -2px rgba(0,0,0,0.2);
+    z-index: 4;
   }
 
   .username {
@@ -140,5 +171,17 @@ export default {
     text-align: right;
     color: grey;
     margin: 15px;
+  }
+
+  // Slide in Transistion
+  .slide-leave-active,
+  .slide-enter-active {
+    transition: 1s;
+  }
+  .slide-enter {
+    transform: translate(0, -100%);
+  }
+  .slide-leave-to {
+    transform: translate(0, -100%);
   }
 </style>

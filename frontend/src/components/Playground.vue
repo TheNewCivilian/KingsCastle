@@ -13,6 +13,8 @@
 import Two from 'two.js';
 import ws from '../api/ws';
 
+const isMobile = () => window.innerWidth <= 1000;
+
 export default {
   data() {
     return {
@@ -39,7 +41,7 @@ export default {
   watch: {
     // TODO FIX Player shown
     isPlayersTurn(newValue) {
-      if (newValue) {
+      if (newValue && !isMobile()) {
         this.two.add(this.playerDot);
       } else {
         this.two.remove(this.playerDot);
@@ -56,7 +58,7 @@ export default {
     }).appendTo(this.$refs.playground);
 
     this.playerDot = this.two.makeCircle(0, 0, 5, 5);
-    if (this.isPlayersTurn) {
+    if (this.isPlayersTurn && !isMobile()) {
       this.two.add(this.playerDot);
     } else {
       this.two.remove(this.playerDot);
