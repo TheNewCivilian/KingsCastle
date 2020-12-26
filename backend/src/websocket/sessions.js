@@ -4,6 +4,7 @@ const {
   invalidateCircled,
   getUnixTime,
   randomString,
+  hashMapToList,
 } = require('./helpers');
 const User = require('./user');
 const Session = require('./session');
@@ -84,18 +85,23 @@ const join = (data, connection) => {
   if (data.sessionId) {
     const selectedSession = sessions[data.sessionId];
     if (selectedSession) {
-      if (!selectedSession.userB) {
-        selectedSession.userB = connection.user;
-      } else {
-        selectedSession.spectators.push(connection.user)
-      }
       connection.sessionId = data.sessionId;
       console.log(`${getUnixTime()} [JOIN] User ${data.username} joined Session ${data.sessionId}`);
-      return {
-        type: 'SESSION_INIT',
-        sessionId: data.sessionId,
-        message: { ...selectedSession, dots: []},
-      };
+      if (!selectedSession.userB) {
+        selectedSession.userB = connection.user;
+        return {
+          type: 'SESSION_INIT',
+          sessionId: data.sessionId,
+          message: { ...selectedSession, dots: []},
+        };
+      } else {
+        selectedSession.spectators.push(connection.user)
+        return {
+          type: 'SESSION_SPECTATE',
+          sessionId: data.sessionId,
+          message: { ...selectedSession, dots: hashMapToList(selectedSession.dots) },
+        };
+      }
     }
   }
 
@@ -151,12 +157,9 @@ const surrender = (connection) => {
   // If user is just a spectator
   currentSession.spectators.filter((spectator) => spectator.userId !== connection.user.userId);
   return {
-    type: 'SESSION_UPDATE',
+    type: 'SPECTATOR_LEAVE',
     sessionId: currentSession.sessionId,
-    message: {
-      action: 'SPECTATOR_LEAVE',
-      spectators: currentSession.spectators,
-    },
+    message: currentSession.spectators,
   };
 };
 

@@ -38,6 +38,17 @@ const onResponse = (store, router, response) => {
     store.dispatch('initSession', data.payload);
     router.push({ name: 'Session', query: { sid: data.payload.sessionId } });
   }
+  if (data.method === 'SESSION_SPECTATE') {
+    if (data.payload.spectators.some((spectator) => spectator.userId === store.getters.userId)) {
+      store.dispatch('initSession', data.payload);
+      router.push({ name: 'Session', query: { sid: data.payload.sessionId } });
+    } else {
+      store.dispatch('setSpectators', data.payload.spectators);
+    }
+  }
+  if (data.method === 'SPECTATOR_LEAVE') {
+    store.dispatch('setSpectators', data.payload);
+  }
   if (data.method === 'SESSION_UPDATE') {
     store.dispatch('addTurn', data.payload);
   }

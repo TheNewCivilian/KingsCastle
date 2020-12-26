@@ -11,6 +11,8 @@ const sendResponse = (connection, websocket, response) => {
     case 'SESSION_UPDATE':
     case 'SESSION_INIT':
     case 'SESSION_END':
+    case 'SESSION_SPECTATE':
+    case 'SPECTATOR_LEAVE':
       websocket.clients.forEach((client) => {
         if (client.sessionId == response.sessionId) {
           sendMessageObject(client, response.type, { ...response.message, userId: client.userId });

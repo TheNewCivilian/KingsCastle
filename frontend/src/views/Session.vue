@@ -2,8 +2,8 @@
   <div class="session">
     <Playground />
     <SessionLobby v-if="!allUsersPresent" />
-    <SessionHead />
-    <ResultPopup v-if="finished" :success="winner"/>
+    <SessionHead v-if="!isSpectator" />
+    <ResultPopup v-if="finished && !isSpectator" :success="winner"/>
   </div>
 </template>
 
@@ -32,6 +32,9 @@ export default {
     },
     winner() {
       return this.$store.getters.winner;
+    },
+    isSpectator() {
+      return this.$store.getters.isSpectator;
     },
   },
   mounted() {

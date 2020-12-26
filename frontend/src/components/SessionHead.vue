@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <div class="wrapper">
-      <button class="surrender" @click="surrender">
+      <button class="surrender" v-if="!isSpectator" @click="surrender">
         <FlagOutlineIcon />
         <span>Surrender</span>
       </button>
@@ -68,6 +68,9 @@ export default {
     },
     isUserA() {
       return this.$store.getters.isUserA;
+    },
+    isSpectator() {
+      return this.$store.getters.isSpectator;
     },
   },
   methods: {

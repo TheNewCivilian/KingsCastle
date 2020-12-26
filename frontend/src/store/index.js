@@ -61,6 +61,9 @@ export default new Vuex.Store({
     SET_CONNECTED(currentState, payload) {
       currentState.connected = payload;
     },
+    SET_SPECTATORS(currentState, payload) {
+      currentState.session.spectators = payload;
+    },
     SET_WINNER(currentState, payload) {
       currentState.winner = payload.winner;
     },
@@ -81,6 +84,9 @@ export default new Vuex.Store({
     disconnect(context) {
       context.commit('SET_CONNECTED', false);
     },
+    setSpectators(context, payload) {
+      context.commit('SET_SPECTATORS', payload);
+    },
     setWinner(context, payload) {
       context.commit('SET_WINNER', payload);
     },
@@ -89,6 +95,9 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    session(currentState) {
+      return currentState.session;
+    },
     error(currentState) {
       return currentState.error;
     },
@@ -143,6 +152,11 @@ export default new Vuex.Store({
     },
     spectators(currentState) {
       return currentState.session.spectators;
+    },
+    isSpectator(currentState) {
+      return currentState.session.spectators.some(
+        (spectator) => spectator.userId === currentState.userId,
+      );
     },
     lastDot(currentState) {
       return currentState.lastDot;
