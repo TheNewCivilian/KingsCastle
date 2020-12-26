@@ -16,7 +16,6 @@ const parseMessage = (message) => {
     }
     return { error: true };
   }
-  console.log(data);
   const method = Object.keys(data)[0];
   return {
     method,
@@ -24,9 +23,8 @@ const parseMessage = (message) => {
   };
 };
 
-const onConnect = (connection) => {
-  console.log(connection.user);
-  console.log(connection.sessionId);
+const onConnect = (websocket, connection) => {
+  console.log(`[CONNECT] now ${websocket.clients.size} online`);
   sendMessageObject(connection, 'CONNECT', { error: false });
 };
 
@@ -37,9 +35,6 @@ const onMessage = (websocket, connection, message) => {
     sendResponse(connection, websocket, Errors.WRONG_DATA_FORMAT);
     return;
   }
-
-  console.log(receivedData);
-
   switch (receivedData.method) {
     case 'JOIN':
       sendResponse(connection, websocket, session.join(receivedData.data, connection));
@@ -60,7 +55,8 @@ const onMessage = (websocket, connection, message) => {
 };
 
 const onClose = (websocket, connection) => {
-  console.log("connection Closed");
+  console.log(`[DISCONNECT] now ${websocket.clients.size} online`);
+  // console.log("connection Closed");
   // sendResponse(connection, websocket, session.surrender(connection));
 };
 

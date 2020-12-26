@@ -4,17 +4,46 @@ const {
   invalidateCircled,
   getUnixTime,
   randomString,
-  hashMapToList,
 } = require('./helpers');
 const User = require('./user');
 const Session = require('./session');
+const fs = require('fs');
 
 const sessions = {};
-const archive = [];
+
+const saveSessionToArchive = (session) => {
+  const archiveData = {
+    id: session.sessionId,
+    start: session.startTime,
+    duration: getUnixTime() - session.startTime,
+    playerA: session.userA,
+    playerB: session.userB,
+    spectators: session.spectators,
+    private: session.private,
+  }
+  fs.writeFile(
+    './log/archive.data',
+    JSON.stringify(archiveData) + '\n',
+    { flag: 'a+' },
+    (err) => {
+      if (err) throw err;
+    },
+  );
+};
+
+const checkSessionsAlive = () => {
+  const currentTime = getUnixTime();
+  Object.keys(sessions).forEach((sessionKey) => {
+    const session = sessions[sessionKey];
+    if ((session.userA && session.userA.lastAction < currentTime - 600)
+      || (session.userB && session.userB.lastAction < currentTime - 600)
+    )
+      endGame(session, 'none after timeout');
+  });
+}
 
 const join = (data, connection) => {
   // validate Input data
-  console.log(data);
   if (!(data.username && data.userId
       && ('sessionId' in data || 'dotCount' in data && 'private' in data ))
   ) {
@@ -23,22 +52,8 @@ const join = (data, connection) => {
 
   connection.user = new User(data.username, data.userId, getUnixTime());
 
-  // Check is user is known. Resend session data.
-  // const presentSession = sessions.find(
-  //   (session) => session.userA.userId === data.user.userId
-  //     || session.userB.userId === data.user.userId,
-  // );
-  // if (presentSession) {
-  //   return {
-  //     type: 'USER_RECONNECT',
-  //     sessionId: presentSession.sessionId,
-  //     message: presentSession,
-  //   };
-  // }
-
   // Opening new Session
   if ('dotCount' in data && 'private' in data) {
-    console.log(Object.keys(sessions).length);
     if (Object.keys(sessions).length > 100) {
       return Errors.MAXIMUM_SESSIONS_REACHED;
     }
@@ -54,6 +69,9 @@ const join = (data, connection) => {
       data.private,
     );
     connection.sessionId = sessionId;
+    // Check if any old session expired.
+    checkSessionsAlive();
+    console.log(`node l[JOIN] User ${data.username} opened Session ${sessionId}`);
     return {
       type: 'SESSION_INIT',
       sessionId: sessionId,
@@ -71,6 +89,7 @@ const join = (data, connection) => {
         selectedSession.spectators.push(connection.user)
       }
       connection.sessionId = data.sessionId;
+      console.log(`[JOIN] User ${data.username} joined Session ${data.sessionId}`);
       return {
         type: 'SESSION_INIT',
         sessionId: data.sessionId,
@@ -80,26 +99,28 @@ const join = (data, connection) => {
   }
 
   // Join a random session
-  const unocupiedSessionKey = Object.keys(sessions).find(
+  const unoccupiedSessionKey = Object.keys(sessions).find(
     (sessionKey) => sessions[sessionKey].userB === null
-      && session[sessionKey].private,
+      && !sessions[sessionKey].private,
   );
 
-  if (unocupiedSessionKey) {
-    const unocupiedSession = sessions[unocupiedSessionKey]
-    unocupiedSession.userB = connection.user;
-    connection.sessionId = unocupiedSession.sessionId;
+  if (unoccupiedSessionKey) {
+    const unoccupiedSession = sessions[unoccupiedSessionKey]
+    unoccupiedSession.userB = connection.user;
+    connection.sessionId = unoccupiedSession.sessionId;
+    console.log(`[JOIN] User ${data.username} joined random Session ${unoccupiedSession.sessionId}`);
     return {
       type: 'SESSION_INIT',
-      sessionId: unocupiedSession.sessionId,
-      message: { ...unocupiedSession, dots: []},
+      sessionId: unoccupiedSession.sessionId,
+      message: { ...unoccupiedSession, dots: []},
     };
   }
   return Errors.SESSION_NOT_FOUND;
 };
 
 const endGame = (currentSession, winner) => {
-  archive.push(currentSession);
+  console.log(`[END] Session Session ${currentSession.sessionId} archived`);
+  saveSessionToArchive(currentSession);
   delete sessions[currentSession.sessionId];
   return {
     type: 'SESSION_END',
@@ -148,6 +169,13 @@ const turn = (data, connection) => {
   const currentSession = sessions[connection.sessionId];
   if (!currentSession) {
     return Errors.SESSION_NOT_FOUND;
+  }
+
+  // Update last user action
+  if (currentSession.userA.userId === connection.user.userId) {
+    currentSession.userA.lastAction = getUnixTime();
+  } else if (currentSession.userB.userId === connection.user.userId) {
+    currentSession.userB.lastAction = getUnixTime();
   }
 
   // Its not users turn

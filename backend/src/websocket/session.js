@@ -1,3 +1,5 @@
+const helpers = require('./helpers');
+
 class Session {
   constructor(
     sessionId,
@@ -16,6 +18,7 @@ class Session {
     this.private = privateSession;
     this.spectators = [];
     this.currentUsersTurn = userA.userId;
+    this.startTime = helpers.getUnixTime();
   }
 }
 
