@@ -66,8 +66,16 @@ export default {
       this.calculatePlayerPos();
     }, { passive: true });
 
+    window.addEventListener('beforeunload', () => {
+      ws.sendSurrender(this.$socket);
+    });
+
     window.addEventListener('keydown', (e) => this.moveBoard(e));
     this.$refs.playground.addEventListener('mousedown', () => this.placePoint());
+  },
+  beforeDestroy() {
+    console.log('unmount');
+    ws.sendSurrender(this.$socket);
   },
   methods: {
     mouseMove(e) {
