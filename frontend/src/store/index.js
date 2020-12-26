@@ -8,6 +8,7 @@ Vue.use(Vuex);
 const emptySession = {
   sessionId: '',
   dots: [],
+  lastDot: {},
   polygons: [],
   pointsA: 0,
   pointsB: 0,
@@ -40,6 +41,7 @@ export default new Vuex.Store({
       currentState.session = payload;
     },
     ADD_TURN(currentState, payload) {
+      currentState.lastDot = payload.newDot;
       currentState.session.dots = [...currentState.session.dots, {
         ...payload.newDot,
         visual: null,
@@ -137,6 +139,9 @@ export default new Vuex.Store({
     },
     spectators(currentState) {
       return currentState.session.spectators;
+    },
+    lastDot(currentState) {
+      return currentState.lastDot;
     },
   },
 });

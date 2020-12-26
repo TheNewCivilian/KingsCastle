@@ -100,14 +100,18 @@ export default {
           if (!dot.visual) {
             dot.visual = this.two.makeCircle(0, 0, 5, 5);
             if (dot.party === 'userA') {
-              dot.visual.fill = '#FCAF58';
+              dot.visual.fill = '#fff';
               dot.visual.stroke = '#FF8C42';
               dot.visual.linewidth = 2;
             } else {
-              dot.visual.fill = '#70C2BF';
+              dot.visual.fill = '#fff';
               dot.visual.stroke = '#48A9A6';
               dot.visual.linewidth = 2;
             }
+          } else if (dot.party === 'userA') {
+            dot.visual.fill = '#FCAF58';
+          } else {
+            dot.visual.fill = '#70C2BF';
           }
           if (dot.invalid) {
             dot.visual.fill = '#fff'; // eslint-disable-line no-param-reassign
