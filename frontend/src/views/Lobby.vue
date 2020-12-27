@@ -1,9 +1,9 @@
 <template>
   <div class="home">
     <div class="video-container">
-      <!-- <video muted loop>
-        <source src='../assets/game_sample.webm' type="video/webm" >
-      </video> -->
+      <video autoplay muted loop>
+        <source src='../assets/kingscastle.mp4' type="video/webm" >
+      </video>
     </div>
     <main-menu />
     <amazon-affiliate />

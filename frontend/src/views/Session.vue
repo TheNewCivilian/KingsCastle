@@ -2,7 +2,7 @@
   <div class="session">
     <Playground />
     <SessionLobby v-if="!allUsersPresent" />
-    <SessionHead v-if="!isSpectator" />
+    <SessionHead />
     <ResultPopup v-if="finished && !isSpectator" :success="winner"/>
   </div>
 </template>
