@@ -16,10 +16,11 @@ const sendJoin = (socket, data) => {
   );
 };
 
-const sendSurrender = (socket) => {
+const sendSurrender = (socket, data) => {
   sendCommand(
     socket,
     'SURRENDER',
+    data,
   );
 };
 
@@ -31,9 +32,8 @@ const sendTurn = (socket, data) => {
   );
 };
 
-const onResponse = (store, router, response) => {
+const onResponse = (route, socket, store, router, response) => {
   const data = JSON.parse(response.data);
-  console.log(data);
   if (data.method === 'SESSION_INIT') {
     store.dispatch('initSession', data.payload);
     router.push({ name: 'Session', query: { sid: data.payload.sessionId } });
@@ -57,6 +57,14 @@ const onResponse = (store, router, response) => {
   }
   if (data.method === 'CONNECT') {
     store.dispatch('connect');
+    if (route.name === 'Session' && store.getters.joined) {
+      console.log('Reconnect');
+      sendCommand(
+        socket,
+        'CONNECT',
+        { userId: store.getters.userId },
+      );
+    }
   }
   if (data.method === 'DISCONNECT') {
     store.dispatch('disconnect');

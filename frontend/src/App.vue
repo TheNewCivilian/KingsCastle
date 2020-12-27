@@ -14,6 +14,8 @@ export default {
   methods: {
     onMessage(recievedMessage) {
       WS.onResponse(
+        this.$route,
+        this.$socket,
         this.$store,
         this.$router,
         recievedMessage,

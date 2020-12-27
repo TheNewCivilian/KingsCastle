@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     surrender() {
-      ws.sendSurrender(this.$socket);
+      ws.sendSurrender(this.$socket, { userId: this.$store.getters.userId });
     },
   },
 };

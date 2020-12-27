@@ -9,7 +9,6 @@ const { getUnixTime } = require('./websocket/helpers');
 const socketPort = 3031;
 const websocket = new WebSocket.Server({ port: socketPort });
 
-console.log(`${ROOT_FOLDER}/log/node.access.log`);
 const accessStream = fs.createWriteStream(`${ROOT_FOLDER}/log/node.access.log`, { flags: 'a+' });
 const errorStream = fs.createWriteStream(`${ROOT_FOLDER}/log/node.error.log`, { flags: 'a+' });
 

@@ -14,6 +14,28 @@ const { sendMail } = require('../mail');
 
 const sessions = {};
 
+const checkConnectionIntegrity = (connection, userId) => {
+  if (!(connection.user || connection.sessionId)) {
+    connection.sessionId = Object.keys(sessions).find((sessionId) => sessions[sessionId].userA.userId === userId
+      || (sessions[sessionId].userB && sessions[sessionId].userB.userId === userId)
+      || sessions[sessionId].spectators.some((spectator) => spectator.userId === userId)
+    );
+    if (connection.sessionId) {
+      const sessionUsers = [
+        sessions[connection.sessionId].userA,
+        sessions[connection.sessionId].userB,
+        ...sessions[connection.sessionId].spectators,
+      ];
+      connection.user = sessionUsers.find((user) => user.userId === userId);
+    }
+  }
+}
+
+const refresh = (data, connection) => {
+  checkConnectionIntegrity(connection, data.userId);
+  console.log(`${getUnixTime()} [REFRESH] ${connection.sessionId} ${data.userId}`);
+}
+
 const saveSessionToArchive = (session) => {
   const archiveData = {
     id: session.sessionId,
@@ -41,6 +63,7 @@ const checkSessionsAlive = () => {
     if ((session.userA && session.userA.lastAction < currentTime - 2400)
       || (session.userB && session.userB.lastAction < currentTime - 2400)
     ) {
+      console.log(`${getUnixTime()} [Timeout] Session ${session.sessionId}`);
       sendMail('[Timeout]', JSON.stringify(session));
       endGame(session, 'none after timeout');
     }
@@ -142,7 +165,13 @@ const endGame = (currentSession, winner) => {
   };
 }
 
-const surrender = (connection) => {
+const surrender = (data, connection) => {
+  // Valid input data
+  if (!('userId' in data)) {
+    return Errors.WRONG_PARMS_FOR_TURN;
+  }
+  checkConnectionIntegrity(connection, data.userId);
+  console.log(`${getUnixTime()} [SURRENDER] ${connection.sessionId} ${data.userId}`);
   const currentSession = sessions[connection.sessionId];
   if (!currentSession) {
     return Errors.SESSION_NOT_FOUND;
@@ -168,10 +197,12 @@ const surrender = (connection) => {
 
 const turn = (data, connection) => {
   // Valid input data
-  if (!('xPos' in data && 'yPos' in data)) {
+  if (!('xPos' in data && 'yPos' in data && 'userId' in data)) {
     return Errors.WRONG_PARMS_FOR_TURN;
   }
-
+  // Find user if connection was reset
+  checkConnectionIntegrity(connection, data.userId);
+  console.log(`${getUnixTime()} [TURN] ${connection.sessionId} ${data.userId}`);
   // Find corresponding session
   const currentSession = sessions[connection.sessionId];
   if (!currentSession) {
@@ -266,4 +297,5 @@ module.exports = {
   join,
   surrender,
   turn,
+  refresh,
 };

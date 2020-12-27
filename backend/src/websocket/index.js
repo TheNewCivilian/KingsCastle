@@ -40,8 +40,11 @@ const onMessage = (websocket, connection, message) => {
     case 'JOIN':
       sendResponse(connection, websocket, session.join(receivedData.data, connection));
       break;
+    case 'CONNECT':
+      session.refresh(receivedData.data, connection);
+      break;
     case 'SURRENDER':
-      sendResponse(connection, websocket, session.surrender(connection));
+      sendResponse(connection, websocket, session.surrender(receivedData.data, connection));
       break;
     case 'TURN':
       sendResponse(connection, websocket, session.turn(receivedData.data, connection));

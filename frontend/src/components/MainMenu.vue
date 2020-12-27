@@ -40,7 +40,7 @@
     </div>
     <div class="section">
       <span class="subtitle">Join Game</span>
-      <span class="description">Join a randome game with no code.</span>
+      <span class="description">Join a random game with no code.</span>
       <span class="error-text">{{ joinError }}</span>
       <input
         id="username_session"

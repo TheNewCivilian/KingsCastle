@@ -70,14 +70,14 @@ export default {
     }, { passive: true });
 
     window.addEventListener('beforeunload', () => {
-      ws.sendSurrender(this.$socket);
+      ws.sendSurrender(this.$socket, { userId: this.$store.getters.userId });
     });
 
     window.addEventListener('keydown', (e) => this.moveBoard(e));
     this.$refs.playground.addEventListener('mousedown', () => this.placePoint());
   },
   beforeDestroy() {
-    ws.sendSurrender(this.$socket);
+    ws.sendSurrender(this.$socket, { userId: this.$store.getters.userId });
   },
   methods: {
     checkTouchMove(e) {
@@ -135,8 +135,8 @@ export default {
           if (!polygon.visual) {
             const vertices = polygon.vertices.map(
               (routElement) => new Two.Vector(
-                (routElement.x - polygon.vertices[0].x) * this.zoomLevel,
-                (routElement.y - polygon.vertices[0].y) * this.zoomLevel,
+                (routElement.x - polygon.vertices[0].x) * 32,
+                (routElement.y - polygon.vertices[0].y) * 32,
               ),
             );
             polygon.visual = new Two.Path(vertices, true, false);
@@ -160,7 +160,7 @@ export default {
       if (this.isPlayersTurn) {
         const xPos = Math.floor((this.lastMouseX - this.offsetX) / this.zoomLevel);
         const yPos = Math.floor((this.lastMouseY - this.offsetY) / this.zoomLevel);
-        ws.sendTurn(this.$socket, { xPos, yPos });
+        ws.sendTurn(this.$socket, { xPos, yPos, userId: this.$store.getters.userId });
       }
     },
     calculatePlayerPos() {
