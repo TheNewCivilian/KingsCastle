@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/preset-env": "^7.9.6",
+    "nodemailer": "^6.4.17",
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.2",
     "ws": "^7.2.5"

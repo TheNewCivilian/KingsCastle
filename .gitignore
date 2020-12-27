@@ -8,3 +8,7 @@ server/node_modules/
 backend/node_modules/
 
 backend/log/
+
+backend/src/secrets.js
+
+backend/src/secrets.json

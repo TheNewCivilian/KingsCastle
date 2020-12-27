@@ -10,6 +10,8 @@ const User = require('./user');
 const Session = require('./session');
 const fs = require('fs');
 const { ROOT_FOLDER } = require('../config');
+const { sendMail } = require('../mail');
+const { timeStamp } = require('console');
 
 const sessions = {};
 
@@ -39,8 +41,10 @@ const checkSessionsAlive = () => {
     const session = sessions[sessionKey];
     if ((session.userA && session.userA.lastAction < currentTime - 2400)
       || (session.userB && session.userB.lastAction < currentTime - 2400)
-    )
+    ) {
+      sendMail('[Timeout]', JSON.stringify(session));
       endGame(session, 'none after timeout');
+    }
   });
 }
 
