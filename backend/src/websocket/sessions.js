@@ -37,8 +37,8 @@ const checkSessionsAlive = () => {
   const currentTime = getUnixTime();
   Object.keys(sessions).forEach((sessionKey) => {
     const session = sessions[sessionKey];
-    if ((session.userA && session.userA.lastAction < currentTime - 600)
-      || (session.userB && session.userB.lastAction < currentTime - 600)
+    if ((session.userA && session.userA.lastAction < currentTime - 2400)
+      || (session.userB && session.userB.lastAction < currentTime - 2400)
     )
       endGame(session, 'none after timeout');
   });
