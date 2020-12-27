@@ -11,7 +11,6 @@ const Session = require('./session');
 const fs = require('fs');
 const { ROOT_FOLDER } = require('../config');
 const { sendMail } = require('../mail');
-const { timeStamp } = require('console');
 
 const sessions = {};
 
