@@ -189,10 +189,10 @@ const eliminateDoublePaths = (start, circle) => {
   });
   const startIndex = circle.path.findIndex((dot) => dot.x === start.x && dot.y === start.y);
   if (startIndex === -1) {
-    return circle;
+    return { length: 0, path: [] };
   }
   if (duplicatePoints.some((dot) => dot.x === start.x && dot.y === start.y)) {
-    return { length: 0, path: [] }
+    return { length: 0, path: [] };
   }
   outPath.push(circle.path[startIndex]);
   for(
