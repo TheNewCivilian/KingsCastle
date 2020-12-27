@@ -9,7 +9,7 @@ const {
 const User = require('./user');
 const Session = require('./session');
 const fs = require('fs');
-const { get } = require('http');
+const { ROOT_FOLDER } = require('../config');
 
 const sessions = {};
 
@@ -24,7 +24,7 @@ const saveSessionToArchive = (session) => {
     private: session.private,
   }
   fs.writeFile(
-    './log/archive.data',
+    `${ROOT_FOLDER}/log/archive.data`,
     JSON.stringify(archiveData) + '\n',
     { flag: 'a+' },
     (err) => {

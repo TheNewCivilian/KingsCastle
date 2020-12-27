@@ -1,0 +1,14 @@
+[Unit]
+Description=Kingscastle-backend
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=ubuntu
+ExecStart=/usr/bin/node /srv/io.kingscastle.api/src/main.js
+
+[Install]
+WantedBy=multi-user.target
