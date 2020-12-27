@@ -8,7 +8,9 @@
       <!-- <span class="description__heighlight">Still missing a christmas present?</span> -->
       Support the independence of KingsCastle.io by searching for amazing things on
       </div>
-      <a class="affiliate" href="https://amazon.com"><AmazonIcon /><span class="spacer">Amazon</span></a>
+      <a target="_blank" class="affiliate" href="https://www.amazon.com/?&_encoding=UTF8&tag=kingscastle0f-20&linkCode=ur2&linkId=070a9fda2f131e3f20ab65fc23270d49&camp=1789&creative=9325">
+        <AmazonIcon /><span class="spacer">Amazon</span>
+      </a>
       <div class="footer-container">
         <span
           class="imprint"
