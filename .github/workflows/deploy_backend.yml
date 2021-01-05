@@ -1,6 +1,6 @@
 name: Backend deploy
 
-on: [push]
+on: [tag]
 
 jobs:
   build:
