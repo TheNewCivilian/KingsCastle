@@ -135,8 +135,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact & Contributors
 
-TheNewCivilian - [https://neuz8t.de](https://neuz8t.de) - private Webpage
-
 Project Link: [https://github.com/TheNewCivilian/KingsCastle](https://github.com/TheNewCivilian/KingsCastle)
 
 

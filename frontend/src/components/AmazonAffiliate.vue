@@ -1,16 +1,15 @@
 <template>
   <div class="page-container">
     <div class="container">
-      <div class="subtitle">
+      <!-- <div class="subtitle">
         <span class="spacer">Support</span><HeartOutlineIcon />
       </div>
       <div class="description">
-      <!-- <span class="description__heighlight">Still missing a christmas present?</span> -->
       Support the independence of KingsCastle.io by searching for amazing things on
       </div>
       <a target="_blank" class="affiliate" href="https://www.amazon.com/?&_encoding=UTF8&tag=kingscastle0f-20&linkCode=ur2&linkId=070a9fda2f131e3f20ab65fc23270d49&camp=1789&creative=9325">
         <AmazonIcon /><span class="spacer">Amazon</span>
-      </a>
+      </a> -->
       <div class="footer-container">
         <span
           class="imprint"
@@ -29,14 +28,14 @@
 </template>
 
 <script>
-import AmazonIcon from 'vue-material-design-icons/Amazon.vue';
-import HeartOutlineIcon from 'vue-material-design-icons/HeartOutline.vue';
+// import AmazonIcon from 'vue-material-design-icons/Amazon.vue';
+// import HeartOutlineIcon from 'vue-material-design-icons/HeartOutline.vue';
 import Imprint from './Imprint.vue';
 
 export default {
   components: {
-    AmazonIcon,
-    HeartOutlineIcon,
+    // AmazonIcon,
+    // HeartOutlineIcon,
     Imprint,
   },
   data: () => ({
