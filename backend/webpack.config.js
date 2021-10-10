@@ -57,7 +57,7 @@ config.module.rules = [
   // Allow loading of JSON files
   {
     test: /\.json$/,
-    loader: "json",
+    loader: "json"
   },
 ]
 
