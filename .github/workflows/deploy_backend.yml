@@ -1,40 +1,31 @@
-name: Backend deploy
+name: Backend build + deploy
 
 on:
   push:
-    branches: main
+    branches: master
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Publish
-        uses: nogsantos/scp-deploy@master
+      - name: Setup ssh
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
-          src: ./backend/*
-          host: ${{ secrets.SSH_HOST }}
-          remote: ${{ secrets.SSH_BE_DIR }}
-          port: ${{ secrets.SSH_PORT }}
-          user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/staging.key
-          chmod 600 ~/.ssh/staging.key
-          cat >>~/.ssh/config <<END
-          Host staging
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/staging.key
-            StrictHostKeyChecking no
-          END
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-      - name: Stop the server
-        run: ssh staging 'sudo systemctl stop kingscastle'
-      - name: Start the server
-        run: ssh staging 'sudo systemctl start kingscastle'
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-host: ${{secrets.SSH_HOST}}
+
+      - uses: actions/checkout@v2
+
+      - name: Enter Frontend dir
+        run: cd ./backend
+      
+      - name: Add secrets
+        run: ${{secrets.MAIL_SECRETS}} >> ./src/secrets.json
+
+      - name: Deploy to Docker Host
+        run: docker-compose -H ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:2375 up --build -d

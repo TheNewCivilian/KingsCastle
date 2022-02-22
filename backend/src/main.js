@@ -6,7 +6,7 @@ const { ROOT_FOLDER } = require('./config');
 const { sendMail } = require('./mail');
 const { getUnixTime } = require('./websocket/helpers');
 
-const socketPort = 3031;
+const socketPort = 3000;
 const websocket = new WebSocket.Server({ port: socketPort });
 
 const accessStream = fs.createWriteStream(`${ROOT_FOLDER}/log/node.access.log`, { flags: 'a+' });

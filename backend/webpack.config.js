@@ -58,6 +58,7 @@ config.module.rules = [
   {
     test: /\.json$/,
     loader: "json",
+    include: "/src",
   },
 ]
 

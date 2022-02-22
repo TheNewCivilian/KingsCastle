@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  kingscastle_io_api:
+    image: "kingscastle_io_api:latest"
+    build: .
+    container_name: "kingscastle_io_api"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kingscastle_io_api.rule=Host(`api.kingscastle.io`)"
+      - "traefik.http.routers.kingscastle_io_api.entrypoints=websecure"
+      - "traefik.http.routers.kingscastle_io_api.tls=true"
+      - "traefik.http.routers.kingscastle_io_api.tls.certResolver=lets_encrypt"

@@ -2,11 +2,10 @@ name: Frontend build + deploy
 
 on:
   push:
-    branches: main
+    branches: master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -14,25 +13,18 @@ jobs:
         node-version: [14.x]
 
     steps:
+      - name: Setup ssh
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-host: ${{secrets.SSH_HOST}}
+
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Prepare
-        run: |
-          cd frontend
-          npm i
-      - name: Build
-        run: |
-          cd frontend
-          npm run build
-      - name: Publish
-        uses: nogsantos/scp-deploy@master
-        with:
-          src: ./frontend/dist/*
-          host: ${{ secrets.SSH_HOST }}
-          remote: ${{ secrets.SSH_DIR }}
-          port: ${{ secrets.SSH_PORT }}
-          user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+
+      - name: Enter Frontend dir
+        run: cd ./frontend
+
+      - name: Deploy to Docker Host
+        run: docker-compose -H ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:2375 up --build -d
+
+        
