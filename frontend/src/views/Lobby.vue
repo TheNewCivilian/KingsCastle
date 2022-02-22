@@ -5,17 +5,17 @@
         <source src='../assets/kingscastle.mp4' type="video/webm" >
       </video>
     </div>
-    <main-menu />
-    <amazon-affiliate />
+    <MainMenu />
+    <SideCard />
   </div>
 </template>
 
 <script>
-import AmazonAffiliate from '../components/AmazonAffiliate.vue';
+import SideCard from '../components/SideCard.vue';
 import MainMenu from '../components/MainMenu.vue';
 
 export default {
-  components: { MainMenu, AmazonAffiliate },
+  components: { MainMenu, SideCard },
   name: 'Home',
 };
 </script>
