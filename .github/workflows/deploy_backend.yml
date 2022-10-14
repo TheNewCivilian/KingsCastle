@@ -7,11 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
       - name: Setup ssh
         uses: kielabokkie/ssh-key-and-known-hosts-action@v1

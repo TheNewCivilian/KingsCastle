@@ -5,6 +5,7 @@ services:
     image: "kingscastle_io_api:latest"
     build: .
     container_name: "kingscastle_io_api"
+    restart: always
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kingscastle_io_api.rule=Host(`api.kingscastle.io`)"
