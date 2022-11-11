@@ -26,6 +26,12 @@ export default {
 </script>
 
 <style lang="scss">
+
+@font-face {
+  font-family: "Balsamiq Sans";
+  src: local("Balsamiq Sans"),   url(/fonts/BalsamiqSans-Regular.ttf) format("truetype");
+}
+
 body, html, #app {
   width: 100%;
   height: 100%;
